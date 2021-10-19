@@ -48,8 +48,10 @@ public class World {
     }
 
     public static void main(String[] args) {
+        out.println("system wystartował");
         String[] tab = new String[]{"f", "f", "r", "l", "b"};
         Direction[] tab_dir = zamien(tab);
         run(tab_dir);
+        out.println("system zakończył działanie");
     }
 }
