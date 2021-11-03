@@ -48,10 +48,12 @@ public class World {
     }
 
     public static void main(String[] args) {
-        out.println("system wystartował");
-        String[] tab = new String[]{"f", "f", "r", "l", "b"};
-        Direction[] tab_dir = zamien(tab);
-        run(tab_dir);
-        out.println("system zakończył działanie");
+        Animal zwierzak = new Animal();
+        String[] behaviour_str = {"r","f","f","f"};
+        MoveDirection behaviour_mov[] = OptionsParser.parse(behaviour_str);
+        for (MoveDirection beh: behaviour_mov){
+            zwierzak.move(beh);
+        }
+        out.println(zwierzak);
     }
 }
