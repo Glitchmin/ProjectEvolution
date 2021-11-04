@@ -16,8 +16,29 @@ public class Animal {
         return "(" + Integer.toString(this.position.x) + "," + Integer.toString(this.position.y) + ") - " + direction.toString();
     }
 
+    public MapDirection getDirection() {
+        return this.direction;
+    }
+
+    public Vector2d getPosition() {
+        return new Vector2d(this.position.x, this.position.y);
+    }
+
+
     public boolean isAt(Vector2d position) {
         return (this.position.x == position.x && this.position.y == position.y);
+    }
+
+
+    public void move_zwierzaka(String[] behaviour_str) {
+        MoveDirection[] behaviour_mov = OptionsParser.parse(behaviour_str);
+        for (MoveDirection beh : behaviour_mov) {
+            if (beh != null) {
+                this.move(beh);
+            } else {
+                break;
+            }
+        }
     }
 
     public void move(MoveDirection direction) {
