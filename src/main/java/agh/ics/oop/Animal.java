@@ -6,7 +6,7 @@ public class Animal {
     private Vector2d position;
     private MapDirection direction;
 
-    public Animal() {
+    public Animal( ) {
         Vector2d position = new Vector2d(2, 2);
         MapDirection direction = MapDirection.NORTH;
     }
