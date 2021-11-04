@@ -47,12 +47,20 @@ public class World {
         out.println("Stop");
     }
 
+
+
+
     public static void main(String[] args) {
         Animal zwierzak = new Animal();
-        String[] behaviour_str = {"r","f","f","f"};
-        MoveDirection behaviour_mov[] = OptionsParser.parse(behaviour_str);
-        for (MoveDirection beh: behaviour_mov){
-            zwierzak.move(beh);
+        String[] behaviour_str = {"r", "f", "f", "f", "g", "h"};
+        out.println(zwierzak);
+        MoveDirection[] behaviour_mov = OptionsParser.parse(behaviour_str);
+        for (MoveDirection beh : behaviour_mov) {
+            if (beh != null) {
+                zwierzak.move(beh);
+            } else {
+                break;
+            }
         }
         out.println(zwierzak);
     }

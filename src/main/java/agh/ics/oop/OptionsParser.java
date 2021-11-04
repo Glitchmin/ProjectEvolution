@@ -5,7 +5,6 @@ public class OptionsParser {
         MoveDirection[] tabdir = new MoveDirection[parametry.length];
         int i = 0;
         for (String parametr : parametry) {
-            i++;
             switch (parametr) {
                 case "f", "forward" -> tabdir[i] = MoveDirection.FORWARD;
                 case "b", "backward" -> tabdir[i] = MoveDirection.BACKWARD;
@@ -13,6 +12,7 @@ public class OptionsParser {
                 case "l", "left" -> tabdir[i] = MoveDirection.LEFT;
                 default -> i--;
             }
+            i++;
         }
         return tabdir;
     }
