@@ -5,15 +5,22 @@ import static java.lang.System.out;
 public class Animal {
     private Vector2d position;
     private MapDirection direction;
+    private IWorldMap map;
 
-    public Animal(){
-        this.position = new Vector2d(2, 2);
+    public Animal(IWorldMap map, Vector2d initial_pos) {
+        this.position = initial_pos;
         this.direction = MapDirection.NORTH;
+        this.map = map;
     }
 
 
     public String toString() {
-        return "(" + Integer.toString(this.position.x) + "," + Integer.toString(this.position.y) + ") - " + direction.toString();
+        return switch (this.direction) {
+            case NORTH -> "^";
+            case EAST -> ">";
+            case WEST -> "<";
+            case SOUTH -> "v";
+        };
     }
 
     public MapDirection getDirection() {
@@ -50,7 +57,7 @@ public class Animal {
             case BACKWARD -> przem = przem.subtract(this.direction.toUnitVector());
         }
         ;
-        if (this.position.add(przem).follows(new Vector2d(0, 0)) && this.position.add(przem).precedes(new Vector2d(4, 4))) {
+        if (map.canMoveTo(this.position.add(przem))) {
             this.position = this.position.add(przem);
         }
     }
