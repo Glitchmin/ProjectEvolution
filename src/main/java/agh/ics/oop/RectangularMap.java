@@ -3,10 +3,10 @@ package agh.ics.oop;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RectangularMap implements IWorldMap {
+public class RectangularMap extends AbstractWorldMap {
     final int width;
     final int height;
-    final List<Animal> animals = new ArrayList<>(); //We're just a bunch of f*cking animals / But we're afraid of the outcome / Don't cry to me because the fiction that we're living in / Says I should pull the pin
+
 
     RectangularMap(int width, int height) {
         this.width = width;
@@ -19,20 +19,12 @@ public class RectangularMap implements IWorldMap {
 
     ;
 
-    public boolean isOccupied(Vector2d position) {
-        for (Animal animal : animals) {
-            if (animal.getPosition().equals(position)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     ;
 
     public boolean place(Animal animal) {
         if (canMoveTo(animal.getPosition())) {
-            animals.add(animal);
+            objects.add(animal);
             return true;
         }
         return false;
@@ -41,18 +33,11 @@ public class RectangularMap implements IWorldMap {
     ;
 
     public Object objectAt(Vector2d position) {
-        for (Animal animal : animals) {
+        for (IMapElement animal : objects) {
             if (animal.getPosition().equals(position)) {
                 return animal;
             }
         }
         return null;
-    }
-
-    ;
-
-    public String toString() {
-        MapVisualizer mapvis = new MapVisualizer(this);
-        return mapvis.draw(new Vector2d(0, 0), new Vector2d(width, height));
     }
 }
