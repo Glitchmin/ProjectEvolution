@@ -1,11 +1,15 @@
 package agh.ics.oop;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static java.lang.System.out;
 
 public class Animal implements IMapElement {
     private Vector2d position;
     private MapDirection direction;
     private IWorldMap map;
+    final List<IPositionChangeObserver> observers = new ArrayList<>();
 
     public Animal(IWorldMap map, Vector2d initial_pos) {
         this.position = initial_pos;
@@ -57,14 +61,29 @@ public class Animal implements IMapElement {
             case BACKWARD -> przem = przem.subtract(this.direction.toUnitVector());
         }
         ;
-        if (map instanceof GrassField && map.objectAt(this.position.add(przem)) instanceof Grass){
-            ((GrassField) map).eatgrass ((Grass) map.objectAt(this.position.add(przem)));
+        if (map instanceof GrassField && map.objectAt(this.position.add(przem)) instanceof Grass) {
+            ((GrassField) map).eatgrass((Grass) map.objectAt(this.position.add(przem)));
             ((GrassField) map).addGrass(((GrassField) map).getGrassAmount());
         }
 
         if (map.canMoveTo(this.position.add(przem))) {
+            positionChanged(this.position,this.position.add(przem));
             this.position = this.position.add(przem);
         }
 
+    }
+
+    void addObserver(IPositionChangeObserver observer) {
+        this.observers.add(observer);
+    }
+
+    void removeObserver(IPositionChangeObserver observer) {
+        this.observers.remove(observer);
+    }
+
+    void positionChanged(Vector2d oldpos, Vector2d newpos){
+        for (IPositionChangeObserver observer: observers){
+            observer.positionChanged(oldpos, newpos);
+        }
     }
 }

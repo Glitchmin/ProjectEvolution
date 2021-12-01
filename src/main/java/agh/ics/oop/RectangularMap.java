@@ -17,27 +17,14 @@ public class RectangularMap extends AbstractWorldMap {
         return (!isOccupied(position) && position.x <= width && position.x >= 0 && position.y >= 0 && position.y <= height);
     }
 
-    ;
-
-
-    ;
 
     public boolean place(Animal animal) {
         if (canMoveTo(animal.getPosition())) {
-            objects.add(animal);
+            objects_pos.put(animal.getPosition(), animal);
+            animal.addObserver(this);
             return true;
         }
         return false;
     }
 
-    ;
-
-    public Object objectAt(Vector2d position) {
-        for (IMapElement animal : objects) {
-            if (animal.getPosition().equals(position)) {
-                return animal;
-            }
-        }
-        return null;
-    }
 }

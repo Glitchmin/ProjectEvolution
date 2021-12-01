@@ -26,7 +26,7 @@ public class GrassField extends AbstractWorldMap {
         while (objectAt(position) != null) {
             position = new Vector2d(rd.nextInt((int)sqrt(grassAmount*10)), rd.nextInt((int)sqrt(grassAmount*10)));
         }
-        this.objects.add(new Grass(position));
+        objects_pos.put(position, new Grass(position));
     }
 
     public GrassField(int grassAmount) {
@@ -40,7 +40,8 @@ public class GrassField extends AbstractWorldMap {
             eatgrass((Grass) objectAt(animal.getPosition()));
         }
         if (!isOccupied(animal.getPosition())){
-            objects.add(animal);
+            objects_pos.put(animal.getPosition(), animal);
+            animal.addObserver(this);
             return true;
         }
         return false;
@@ -48,7 +49,7 @@ public class GrassField extends AbstractWorldMap {
 
 
     public void eatgrass(Grass grass){
-        objects.remove(grass);
+        objects_pos.remove(grass.getPosition());
     }
 
 
