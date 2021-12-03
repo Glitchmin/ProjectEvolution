@@ -44,7 +44,7 @@ public class GrassField extends AbstractWorldMap {
             animal.addObserver(this);
             return true;
         }
-        return false;
+        throw new IllegalArgumentException("nie można tu stawiać zwierzaków mój panie");
     }
 
 

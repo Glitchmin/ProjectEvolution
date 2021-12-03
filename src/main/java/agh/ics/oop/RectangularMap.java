@@ -18,13 +18,13 @@ public class RectangularMap extends AbstractWorldMap {
     }
 
 
-    public boolean place(Animal animal) {
+    public boolean place(Animal animal) throws IllegalArgumentException {
         if (canMoveTo(animal.getPosition())) {
             objects_pos.put(animal.getPosition(), animal);
             animal.addObserver(this);
             return true;
         }
-        return false;
+        throw new IllegalArgumentException("nie można tu stawiać zwierzaków mój panie");
     }
 
 }
