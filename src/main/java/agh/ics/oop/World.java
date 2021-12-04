@@ -1,6 +1,9 @@
 package agh.ics.oop;
 
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import static java.lang.System.arraycopy;
 import static java.lang.System.out;
@@ -51,6 +54,8 @@ public class World {
 
 
     public static void main(String[] args) {
+
+
         MoveDirection[] directions;
         try {
             directions = OptionsParser.parse(args);
@@ -59,7 +64,8 @@ public class World {
             return;
         }
         IWorldMap map = new GrassField(10);
-        Vector2d[] positions = { new Vector2d(2,2), new Vector2d(2,2) };
+
+        Vector2d[] positions = { new Vector2d(2,2), new Vector2d(2,3) };
         try {
             IEngine engine = new SimulationEngine(directions, map, positions);
             engine.run();

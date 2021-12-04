@@ -67,23 +67,23 @@ public class Animal implements IMapElement {
         }
 
         if (map.canMoveTo(this.position.add(przem))) {
-            positionChanged(this.position,this.position.add(przem));
+            positionChanged(this.position, this.position.add(przem), this);
             this.position = this.position.add(przem);
         }
 
     }
 
-    void addObserver(IPositionChangeObserver observer) {
+    public void addObserver(IPositionChangeObserver observer) {
         this.observers.add(observer);
     }
 
-    void removeObserver(IPositionChangeObserver observer) {
+    public void removeObserver(IPositionChangeObserver observer) {
         this.observers.remove(observer);
     }
 
-    void positionChanged(Vector2d oldpos, Vector2d newpos){
-        for (IPositionChangeObserver observer: observers){
-            observer.positionChanged(oldpos, newpos);
+    void positionChanged(Vector2d oldpos, Vector2d newpos, IMapElement object) {
+        for (IPositionChangeObserver observer : observers) {
+            observer.positionChanged(oldpos, newpos, this);
         }
     }
 }

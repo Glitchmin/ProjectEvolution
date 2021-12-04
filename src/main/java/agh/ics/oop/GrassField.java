@@ -12,6 +12,7 @@ public class GrassField extends AbstractWorldMap {
     Vector2d lowerLeft;
     Vector2d upperRight;
     private int  grassAmount;
+    MapBoundary mapBoundary;
 
     public int getGrassAmount(){
         return grassAmount;
@@ -26,10 +27,14 @@ public class GrassField extends AbstractWorldMap {
         while (objectAt(position) != null) {
             position = new Vector2d(rd.nextInt((int)sqrt(grassAmount*10)), rd.nextInt((int)sqrt(grassAmount*10)));
         }
-        objects_pos.put(position, new Grass(position));
+        Grass grass = new Grass(position);
+        mapBoundary.add(position, grass);
+        objects_pos.put(position, grass);
+
     }
 
     public GrassField(int grassAmount) {
+        mapBoundary = new MapBoundary();
         for (int i = 0; i < grassAmount; i++) {
             addGrass(grassAmount);
         }
@@ -42,6 +47,8 @@ public class GrassField extends AbstractWorldMap {
         if (!isOccupied(animal.getPosition())){
             objects_pos.put(animal.getPosition(), animal);
             animal.addObserver(this);
+            animal.addObserver(mapBoundary);
+            mapBoundary.add(animal.getPosition(), animal);
             return true;
         }
         throw new IllegalArgumentException("nie można tu stawiać zwierzaków mój panie");
@@ -50,8 +57,17 @@ public class GrassField extends AbstractWorldMap {
 
     public void eatgrass(Grass grass){
         objects_pos.remove(grass.getPosition());
+        mapBoundary.remove(grass.getPosition());
     }
 
+    @Override
+    protected Vector2d[] wymiary(){
+        Vector2d[] tab = new Vector2d[2];
+        tab[0] = mapBoundary.getLower_left();
+        tab[1] = mapBoundary.getUpper_right();
+        out.println(tab[1]);
+        return tab;
+    }
 
 
     public boolean canMoveTo(Vector2d position){

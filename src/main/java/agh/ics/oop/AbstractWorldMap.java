@@ -18,7 +18,7 @@ abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
         return objects_pos.get(position);
     }
 
-    private Vector2d[] wymiary() {
+    protected Vector2d[] wymiary() {
         Vector2d lowerleft = new Vector2d(0, 0);
         Vector2d upperright = new Vector2d(1, 1);
 
@@ -42,7 +42,7 @@ abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
     }
 
     @Override
-    public void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+    public void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
         objects_pos.put(newPosition, (IMapElement) objectAt(oldPosition));
         objects_pos.remove(oldPosition);
     }
