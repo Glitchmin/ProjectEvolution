@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
+import static java.lang.System.out;
+
+abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
 
     final Map<Vector2d, IMapElement> objects_pos = new HashMap<>();
 
@@ -18,7 +20,7 @@ abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
         return objects_pos.get(position);
     }
 
-    protected Vector2d[] wymiary() {
+    public Vector2d[] wymiary() {
         Vector2d lowerleft = new Vector2d(0, 0);
         Vector2d upperright = new Vector2d(1, 1);
 
@@ -31,7 +33,9 @@ abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
         Vector2d[] tab = new Vector2d[2];
         tab[0] = lowerleft;
         tab[1] = upperright;
+        out.println("test");
         return tab;
+
     }
 
 

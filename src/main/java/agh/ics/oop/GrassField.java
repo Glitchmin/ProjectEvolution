@@ -9,8 +9,6 @@ import static java.lang.System.out;
 import static java.lang.Math.sqrt;
 
 public class GrassField extends AbstractWorldMap {
-    Vector2d lowerLeft;
-    Vector2d upperRight;
     private int  grassAmount;
     MapBoundary mapBoundary;
 
@@ -61,11 +59,10 @@ public class GrassField extends AbstractWorldMap {
     }
 
     @Override
-    protected Vector2d[] wymiary(){
+    public Vector2d[] wymiary(){
         Vector2d[] tab = new Vector2d[2];
         tab[0] = mapBoundary.getLower_left();
         tab[1] = mapBoundary.getUpper_right();
-        out.println(tab[1]);
         return tab;
     }
 

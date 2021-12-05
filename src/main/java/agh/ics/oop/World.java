@@ -1,5 +1,8 @@
 package agh.ics.oop;
 
+import agh.ics.oop.gui.App;
+import javafx.application.Application;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.SortedMap;
@@ -52,26 +55,10 @@ public class World {
 
 
 
-
+    //f b r l f f r r f f f f f f f f
     public static void main(String[] args) {
 
-
-        MoveDirection[] directions;
-        try {
-            directions = OptionsParser.parse(args);
-        }catch (IllegalArgumentException ex){
-            out.println(ex);
-            return;
-        }
-        IWorldMap map = new GrassField(10);
-
-        Vector2d[] positions = { new Vector2d(2,2), new Vector2d(2,3) };
-        try {
-            IEngine engine = new SimulationEngine(directions, map, positions);
-            engine.run();
-        }catch (IllegalArgumentException ex){
-            out.println(ex);
-        }
+        Application.launch(App.class, args);
 
     }
 }
