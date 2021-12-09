@@ -63,7 +63,13 @@ public class MapBoundary implements IPositionChangeObserver {
         object_positions_y_first.put(newPosition, object);
     }
 
+    public Object objectAt(Vector2d position){
+        return object_positions_x_first.get(position);
+    }
+
+
     public void add(Vector2d position, IMapElement object) {
+
         object_positions_x_first.put(position, object);
         object_positions_y_first.put(position, object);
     }

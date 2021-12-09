@@ -9,7 +9,7 @@ import static java.lang.System.out;
 
 abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
 
-    final Map<Vector2d, IMapElement> objects_pos = new HashMap<>();
+    final MapBoundary mapBoundary = new MapBoundary();
 
     @Override
     public boolean isOccupied(Vector2d position) {
@@ -17,25 +17,14 @@ abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     }
 
     public Object objectAt(Vector2d position) {
-        return objects_pos.get(position);
+        return mapBoundary.objectAt(position);
     }
 
-    public Vector2d[] wymiary() {
-        Vector2d lowerleft = new Vector2d(0, 0);
-        Vector2d upperright = new Vector2d(1, 1);
-
-        for (Vector2d object_pos : objects_pos.keySet()) {
-            lowerleft = lowerleft.lowerLeft(object_pos);
-            upperright = upperright.upperRight(object_pos);
-        }
-
-
+    public Vector2d[] wymiary(){
         Vector2d[] tab = new Vector2d[2];
-        tab[0] = lowerleft;
-        tab[1] = upperright;
-        out.println("test");
+        tab[0] = mapBoundary.getLower_left();
+        tab[1] = mapBoundary.getUpper_right();
         return tab;
-
     }
 
 
@@ -47,8 +36,7 @@ abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObse
 
     @Override
     public void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
-        objects_pos.put(newPosition, (IMapElement) objectAt(oldPosition));
-        objects_pos.remove(oldPosition);
+        mapBoundary.positionChanged(oldPosition,newPosition,object);
     }
 
 

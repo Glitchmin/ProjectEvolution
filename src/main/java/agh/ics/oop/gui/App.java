@@ -94,9 +94,7 @@ public class App extends Application {
 
     private void addXLabels(GridPane gridPane, Vector2d mapUpperRight, Vector2d mapLowerLeft) {
         for (int x = mapLowerLeft.getX(); x <= mapUpperRight.getX(); x++) {
-            Label labelX = new Label(Integer.toString(x));
-            GridPane.setHalignment(labelX, HPos.CENTER);
-            gridPane.add(labelX, x - mapLowerLeft.getX() + 1, 0, 1, 1);
+            addCenteredLabel(gridPane, Integer.toString(x), x - mapLowerLeft.getX() + 1, 0);
         }
     }
 }
