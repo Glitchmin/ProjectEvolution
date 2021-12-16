@@ -1,5 +1,6 @@
 package agh.ics.oop;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,11 +21,23 @@ abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         return mapBoundary.objectAt(position);
     }
 
-    public Vector2d[] wymiary(){
+    public Vector2d[] wymiary() {
         Vector2d[] tab = new Vector2d[2];
         tab[0] = mapBoundary.getLower_left();
         tab[1] = mapBoundary.getUpper_right();
         return tab;
+    }
+
+    public Object[][] copy() {
+        Vector2d lowerLeft = wymiary()[0];
+        Vector2d upperRight = wymiary()[1];
+        Object[][] mapCopy = new Object[upperRight.getX() - lowerLeft.getX() + 1][upperRight.getY() - lowerLeft.getY() + 1];
+        for (int x = lowerLeft.getX(); x <= upperRight.getX(); x++) {
+            for (int y = lowerLeft.getY(); y <= upperRight.getY(); y++) {
+                mapCopy[x - lowerLeft.getX()][y - lowerLeft.getY()] = objectAt(new Vector2d(x, y));
+            }
+        }
+        return mapCopy;
     }
 
 
@@ -36,7 +49,7 @@ abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObse
 
     @Override
     public void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
-        mapBoundary.positionChanged(oldPosition,newPosition,object);
+        mapBoundary.positionChanged(oldPosition, newPosition, object);
     }
 
 

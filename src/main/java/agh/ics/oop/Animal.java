@@ -17,6 +17,15 @@ public class Animal implements IMapElement {
         this.map = map;
     }
 
+    @Override
+    public String returnResourcePath() {
+        return switch (this.direction) {
+            case NORTH -> "src/main/resources/up.png";
+            case EAST -> "src/main/resources/right.png";
+            case WEST -> "src/main/resources/left.png";
+            case SOUTH -> "src/main/resources/down.png";
+        };
+    }
 
     public String toString() {
         return switch (this.direction) {
@@ -81,9 +90,9 @@ public class Animal implements IMapElement {
         this.observers.remove(observer);
     }
 
-    void positionChanged(Vector2d oldpos, Vector2d newpos, IMapElement object) {
+    void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
         for (IPositionChangeObserver observer : observers) {
-            observer.positionChanged(oldpos, newpos, this);
+            observer.positionChanged(oldPosition, newPosition, this);
         }
     }
 }

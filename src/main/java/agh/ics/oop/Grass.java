@@ -6,6 +6,10 @@ import java.util.List;
 public class Grass implements IMapElement {
     private final Vector2d position;
 
+    @Override
+    public String returnResourcePath() {
+        return "src/main/resources/grass.png";
+    }
 
     public Grass(Vector2d position) {
         this.position = position;
