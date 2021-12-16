@@ -84,6 +84,10 @@ public class App extends Application implements IPositionChangeObserver {
         Button buttonStart = new Button("Do przodu, dzielne stworzonka!");
 
         buttonStart.setOnAction(actionEvent ->  {
+            Vector2d[] positions = {new Vector2d(2, 2), new Vector2d(2, 3)};
+            engine = new SimulationEngine(map, positions);
+            engineThread  = new Thread(engine);
+            engine.addObserver(this);
             engine.setDirections(OptionsParser.parse(textField.getText().split(" ")));
             engineThread.start();
         });
@@ -97,11 +101,9 @@ public class App extends Application implements IPositionChangeObserver {
     @Override
     public void init(){
         try {
-            Vector2d[] positions = {new Vector2d(2, 2), new Vector2d(2, 3)};
+
             map = new GrassField(10);
-            engine = new SimulationEngine(map, positions);
-            engineThread  = new Thread(engine);
-            engine.addObserver(this);
+
 
         } catch (IllegalArgumentException ex) {
             out.println(ex);
