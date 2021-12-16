@@ -1,8 +1,6 @@
 package agh.ics.oop;
 
-import java.util.Comparator;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import static java.lang.System.out;
 
@@ -65,6 +63,25 @@ public class MapBoundary implements IPositionChangeObserver {
 
     public Object objectAt(Vector2d position){
         return object_positions_x_first.get(position);
+    }
+
+    public void clearAnimals(){
+        out.println("clearance has began");
+        if (object_positions_x_first.isEmpty()){
+            return;
+        }
+        List<Vector2d> keyList = new ArrayList<>();
+        for (Vector2d key: object_positions_x_first.keySet()){
+            if (object_positions_x_first.get(key) instanceof Animal){
+                out.print("clear animals ");
+                out.println(key);
+                keyList.add(key);
+            }
+        }
+        for (Vector2d key: keyList){
+            object_positions_x_first.remove(key);
+            object_positions_y_first.remove(key);
+        }
     }
 
 

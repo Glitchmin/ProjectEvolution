@@ -17,6 +17,10 @@ abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         return objectAt(position) != null;
     }
 
+    public void clearAnimals(){
+        mapBoundary.clearAnimals();
+    }
+
     public Object objectAt(Vector2d position) {
         return mapBoundary.objectAt(position);
     }

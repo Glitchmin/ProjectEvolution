@@ -23,6 +23,7 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     public SimulationEngine(IWorldMap map, Vector2d[] positions) {
+        map.clearAnimals();
         for (Vector2d position : positions) {
             Animal animal = new Animal(map, position);
             map.place(animal);
