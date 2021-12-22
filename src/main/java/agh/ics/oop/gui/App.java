@@ -16,8 +16,6 @@ import javafx.stage.Stage;
 
 import static java.lang.System.out;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 
 public class App extends Application implements IPositionChangeObserver {
 
@@ -38,7 +36,7 @@ public class App extends Application implements IPositionChangeObserver {
         }
     }
 
-    private void addCenteredLabel(GridPane gridPane, String tekst, int x, int y){
+    private void addCenteredLabel(GridPane gridPane, String tekst, int x, int y) {
         Label label = new Label(tekst);
         GridPane.setHalignment(label, HPos.CENTER);
         gridPane.add(label, x, y, 1, 1);
@@ -47,12 +45,12 @@ public class App extends Application implements IPositionChangeObserver {
 
     private void addObjectsAndYLabels(Object[][] mapCopy, GridPane gridPane, Vector2d mapUpperRight, Vector2d mapLowerLeft) {
         for (int y = mapUpperRight.getY(); y >= mapLowerLeft.getY(); y--) {
-            addCenteredLabel(gridPane,Integer.toString(y),0, (mapUpperRight.getY() - y) + 1);
+            addCenteredLabel(gridPane, Integer.toString(y), 0, (mapUpperRight.getY() - y) + 1);
             for (int x = mapLowerLeft.getX(); x <= mapUpperRight.getX(); x++) {
-                if (mapCopy[x-mapLowerLeft.getX()][y-mapLowerLeft.getY()] != null) {
-                    try{
-                        gridPane.add(new GuiElementBox((IMapElement)mapCopy[x-mapLowerLeft.getX()][y-mapLowerLeft.getY()],new Vector2d(x,y).toString()).getVBox(),x - mapLowerLeft.getX() + 1,(mapUpperRight.getY() - y) + 1,1,1);
-                    }catch (java.io.FileNotFoundException ex){
+                if (mapCopy[x - mapLowerLeft.getX()][y - mapLowerLeft.getY()] != null) {
+                    try {
+                        gridPane.add(new GuiElementBox((IMapElement) mapCopy[x - mapLowerLeft.getX()][y - mapLowerLeft.getY()], new Vector2d(x, y).toString()).getVBox(), x - mapLowerLeft.getX() + 1, (mapUpperRight.getY() - y) + 1, 1, 1);
+                    } catch (java.io.FileNotFoundException ex) {
                         out.println(ex);
                     }
                 }
@@ -83,23 +81,23 @@ public class App extends Application implements IPositionChangeObserver {
 
         Button buttonStart = new Button("Do przodu, dzielne stworzonka!");
 
-        buttonStart.setOnAction(actionEvent ->  {
+        buttonStart.setOnAction(actionEvent -> {
             Vector2d[] positions = {new Vector2d(2, 2), new Vector2d(2, 3)};
             engine = new SimulationEngine(map, positions);
-            engineThread  = new Thread(engine);
+            engineThread = new Thread(engine);
             engine.addObserver(this);
             engine.setDirections(OptionsParser.parse(textField.getText().split(" ")));
             engineThread.start();
         });
         gridPane.setGridLinesVisible(true);
-        gridPane.add(new HBox(buttonStart,textField),0,-mapLowerLeft.getY()+mapUpperRight.getY()+4,10,1);
+        gridPane.add(new HBox(buttonStart, textField), 0, -mapLowerLeft.getY() + mapUpperRight.getY() + 4, 10, 1);
 
 
         primaryStage.show();
     }
 
     @Override
-    public void init(){
+    public void init() {
         try {
 
             map = new GrassField(10);
@@ -117,7 +115,7 @@ public class App extends Application implements IPositionChangeObserver {
         Scene scene = new Scene(gridPane, 600, 700);
         textField = new TextField("f b r l f f r r f f f f f f f f");
         primaryStage.setScene(scene);
-        this.primaryStage=primaryStage;
+        this.primaryStage = primaryStage;
         Platform.runLater(primaryStage::show);
         Platform.runLater(this::updateView);
     }
