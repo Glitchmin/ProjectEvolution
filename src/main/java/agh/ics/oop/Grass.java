@@ -7,7 +7,7 @@ public class Grass implements IMapElement {
     private final Vector2d position;
 
     @Override
-    public String returnResourcePath() {
+    public String getResourcePath() {
         return "src/main/resources/grass.png";
     }
 

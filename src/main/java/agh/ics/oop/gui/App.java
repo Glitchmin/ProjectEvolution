@@ -98,7 +98,7 @@ public class App extends Application implements IPositionChangeObserver {
     @Override
     public void init() {
         try {
-            map = new GrassField(10);
+            map = new RectangularMap(10,10);
 
 
         } catch (IllegalArgumentException ex) {

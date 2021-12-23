@@ -5,5 +5,5 @@ public interface IMapElement {
 
     public boolean isAt(Vector2d position);
 
-    public String returnResourcePath();
+    public String getResourcePath();
 }

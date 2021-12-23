@@ -1,16 +1,19 @@
 package agh.ics.oop;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static java.lang.System.out;
 
 public class Animal implements IMapElement {
     private Vector2d position;
     private MapDirection direction;
-    private IWorldMap map;
+    private final IWorldMap map;
     final List<IPositionChangeObserver> observers = new ArrayList<>();
     private int energy;
+    final int [] genotype;
 
     static private int startEnergy;
     static private int moveEnergy;
@@ -44,26 +47,29 @@ public class Animal implements IMapElement {
         this.position = initialPos;
         this.direction = MapDirection.NORTH;
         this.map = map;
-        this.energy = startEnergy;
+
+        this.energy = new Random().nextInt()%startEnergy;
+        this.genotype = new int[32];
+        Random rn = new Random();
+        for (int i=0; i<32;i++){
+            genotype[i]=rn.nextInt(8);
+        }
+        out.println("utworzono zwierzaka");
+        Arrays.sort(genotype);
+        out.println(Arrays.toString(genotype));
     }
 
     @Override
-    public String returnResourcePath() {
-        return switch (this.direction) {
-            case NORTH -> "src/main/resources/up.png";
-            case EAST -> "src/main/resources/right.png";
-            case WEST -> "src/main/resources/left.png";
-            case SOUTH -> "src/main/resources/down.png";
-        };
+    public String getResourcePath() {
+        return "src/main/resources/animal.png";
+    }
+
+    public double getEnergySaturation(){
+        return (double)energy/(double)startEnergy;
     }
 
     public String toString() {
-        return switch (this.direction) {
-            case NORTH -> "^";
-            case EAST -> ">";
-            case WEST -> "<";
-            case SOUTH -> "v";
-        };
+        return "a";
     }
 
     public MapDirection getDirection() {

@@ -8,7 +8,7 @@ public class RectangularMap extends AbstractWorldMap {
     final int height;
 
 
-    RectangularMap(int width, int height) {
+    public RectangularMap(int width, int height) {
         this.width = width;
         this.height = height;
     }
