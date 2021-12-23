@@ -11,13 +11,40 @@ import static java.lang.System.out;
 abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
 
     final MapBoundary mapBoundary = new MapBoundary();
+    private static double jungleRatio;
+    private static int width;
+    private static int height;
+
+    public static double getJungleRatio() {
+        return jungleRatio;
+    }
+
+    public static void setJungleRatio(double jungleRatio) {
+        AbstractWorldMap.jungleRatio = jungleRatio;
+    }
+
+    public static int getWidth() {
+        return width;
+    }
+
+    public static void setWidth(int width) {
+        AbstractWorldMap.width = width;
+    }
+
+    public static int getHeight() {
+        return height;
+    }
+
+    public static void setHeight(int height) {
+        AbstractWorldMap.height = height;
+    }
 
     @Override
     public boolean isOccupied(Vector2d position) {
         return objectAt(position) != null;
     }
 
-    public void clearAnimals(){
+    public void clearAnimals() {
         mapBoundary.clearAnimals();
     }
 

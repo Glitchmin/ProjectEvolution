@@ -8,11 +8,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.System.out;
 
@@ -24,7 +24,7 @@ public class App extends Application implements IPositionChangeObserver {
     private Stage primaryStage;
     private SimulationEngine engine;
     private Thread engineThread;
-    private TextField textField;
+    private List<TextField> menuTextFields;
 
     private void addConstraintsForColumns(GridPane gridPane, Vector2d mapUpperRight, Vector2d mapLowerLeft) {
         for (int y = mapUpperRight.getY() + 1; y >= mapLowerLeft.getY(); y--) {
@@ -73,24 +73,23 @@ public class App extends Application implements IPositionChangeObserver {
         Vector2d mapLowerLeft = map.wymiary()[0];
         Object[][] mapCopy = map.copy();
 
-        gridPane.add(new Label("y/x"), 0, 0, 1, 1);
+        addCenteredLabel(gridPane, "y/x",0,0);
 
         addXLabels(gridPane, mapUpperRight, mapLowerLeft);
         addObjectsAndYLabels(mapCopy, gridPane, mapUpperRight, mapLowerLeft);
         addConstraintsForColumns(gridPane, mapUpperRight, mapLowerLeft);
 
-        Button buttonStart = new Button("Do przodu, dzielne stworzonka!");
+        Button buttonStart = new Button("Go!");
 
         buttonStart.setOnAction(actionEvent -> {
             Vector2d[] positions = {new Vector2d(2, 2), new Vector2d(2, 3)};
             engine = new SimulationEngine(map, positions);
             engineThread = new Thread(engine);
             engine.addObserver(this);
-            engine.setDirections(OptionsParser.parse(textField.getText().split(" ")));
             engineThread.start();
         });
         gridPane.setGridLinesVisible(true);
-        gridPane.add(new HBox(buttonStart, textField), 0, -mapLowerLeft.getY() + mapUpperRight.getY() + 4, 10, 1);
+        gridPane.add(new HBox(buttonStart), 0, -mapLowerLeft.getY() + mapUpperRight.getY() + 4, 10, 1);
 
 
         primaryStage.show();
@@ -99,7 +98,6 @@ public class App extends Application implements IPositionChangeObserver {
     @Override
     public void init() {
         try {
-
             map = new GrassField(10);
 
 
@@ -110,14 +108,60 @@ public class App extends Application implements IPositionChangeObserver {
 
     }
 
+    private void renderMenu() {
+        gridPane = new GridPane();
+        Scene scene = new Scene(gridPane, 500, 500);
+
+        addParamFieldsToMenu();
+
+        Button buttonStart = new Button("Start!");
+        gridPane.add(buttonStart,0,7,1,1);
+        primaryStage.setScene(scene);
+        Platform.runLater(primaryStage::show);
+
+        buttonStart.setOnAction(actionEvent -> {
+            getParamsFromMenuTextFields();
+            Platform.runLater(this::updateView);
+        });
+
+    }
+
+    private void getParamsFromMenuTextFields(){
+        AbstractWorldMap.setHeight(Integer.parseInt(menuTextFields.get(0).getText()));
+        AbstractWorldMap.setWidth(Integer.parseInt(menuTextFields.get(1).getText()));
+        Animal.setStartEnergy(Integer.parseInt(menuTextFields.get(2).getText()));
+        Animal.setMoveEnergy(Integer.parseInt(menuTextFields.get(3).getText()));
+        Animal.setPlantEnergy(Integer.parseInt(menuTextFields.get(4).getText()));
+        AbstractWorldMap.setJungleRatio(Double.parseDouble(menuTextFields.get(5).getText()));
+        out.println("test:");
+        for (int i=0; i<5;i++) {
+            out.println(menuTextFields.get(i).getText());
+        }
+    }
+
+    private void addParamFieldsToMenu() {
+        String [] intParamNames  = {"Width","Height","Start Energy","Move Energy","Plant Energy"};
+         menuTextFields = new ArrayList<>();
+
+        for (int i=0; i<5;i++){
+            TextField intParamTextField = new TextField(new Integer[]{40,40,100,1,10}[i].toString());
+            gridPane.add(new HBox(new Label(intParamNames[i]),intParamTextField),0,i,1,1);
+            menuTextFields.add(intParamTextField);
+        }
+        TextField jungleParamTextField = new TextField("0.5");
+        gridPane.add(new HBox(new Label("Jungle Ratio"),jungleParamTextField),0,6,1,1);
+        menuTextFields.add(jungleParamTextField);
+
+
+    }
+
     public void start(Stage primaryStage) {
         gridPane = new GridPane();
         Scene scene = new Scene(gridPane, 600, 700);
-        textField = new TextField("f b r l f f r r f f f f f f f f");
         primaryStage.setScene(scene);
         this.primaryStage = primaryStage;
         Platform.runLater(primaryStage::show);
-        Platform.runLater(this::updateView);
+        Platform.runLater(this::renderMenu);
     }
 
 

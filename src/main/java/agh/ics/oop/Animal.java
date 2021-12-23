@@ -10,11 +10,41 @@ public class Animal implements IMapElement {
     private MapDirection direction;
     private IWorldMap map;
     final List<IPositionChangeObserver> observers = new ArrayList<>();
+    private int energy;
 
-    public Animal(IWorldMap map, Vector2d initial_pos) {
-        this.position = initial_pos;
+    static private int startEnergy;
+    static private int moveEnergy;
+    static private int plantEnergy;
+
+    public static int getStartEnergy() {
+        return startEnergy;
+    }
+
+    public static void setStartEnergy(int startEnergy) {
+        Animal.startEnergy = startEnergy;
+    }
+
+    public static int getMoveEnergy() {
+        return moveEnergy;
+    }
+
+    public static void setMoveEnergy(int moveEnergy) {
+        Animal.moveEnergy = moveEnergy;
+    }
+
+    public static int getPlantEnergy() {
+        return plantEnergy;
+    }
+
+    public static void setPlantEnergy(int plantEnergy) {
+        Animal.plantEnergy = plantEnergy;
+    }
+
+    public Animal(IWorldMap map, Vector2d initialPos) {
+        this.position = initialPos;
         this.direction = MapDirection.NORTH;
         this.map = map;
+        this.energy = startEnergy;
     }
 
     @Override
@@ -50,17 +80,6 @@ public class Animal implements IMapElement {
     }
 
 
-    public void move_zwierzaka(String[] behaviour_str) {
-        MoveDirection[] behaviour_mov = OptionsParser.parse(behaviour_str);
-        for (MoveDirection beh : behaviour_mov) {
-            if (beh != null) {
-                this.move(beh);
-            } else {
-                break;
-            }
-        }
-    }
-
     public void move(MoveDirection direction) {
         Vector2d przem = new Vector2d(0, 0);
         switch (direction) {
@@ -70,10 +89,6 @@ public class Animal implements IMapElement {
             case BACKWARD -> przem = przem.subtract(this.direction.toUnitVector());
         }
         ;
-        if (map instanceof GrassField && map.objectAt(this.position.add(przem)) instanceof Grass) {
-            ((GrassField) map).eatgrass((Grass) map.objectAt(this.position.add(przem)));
-            ((GrassField) map).addGrass(((GrassField) map).getGrassAmount());
-        }
 
         if (map.canMoveTo(this.position.add(przem))) {
             positionChanged(this.position, this.position.add(przem), this);
