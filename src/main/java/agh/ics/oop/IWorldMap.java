@@ -17,8 +17,6 @@ public interface IWorldMap {
      */
     boolean canMoveTo(Vector2d position);
 
-    void clearAnimals();
-
     /**
      * Place a animal on the map.
      *

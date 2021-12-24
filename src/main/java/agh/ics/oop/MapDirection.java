@@ -10,23 +10,11 @@ public enum MapDirection {
     WEST,
     NORTH_WEST;
 
-    public String toString() {
-        return switch (this) {
-            case NORTH -> "Północ";
-            case SOUTH -> "Południe";
-            case WEST -> "Zachód";
-            default -> "Wschód";
-        };
+
+    public MapDirection turnRightBy(int numberOfTurns) {
+        return values()[(ordinal() + numberOfTurns) % values().length];
     }
 
-    public MapDirection next() {
-        return values()[(ordinal() + 1) % values().length];
-    }
-
-
-    public MapDirection previous() {
-        return values()[(ordinal() - 1 + values().length) % values().length];
-    }
 
     public Vector2d toUnitVector() {
         return switch (this) {

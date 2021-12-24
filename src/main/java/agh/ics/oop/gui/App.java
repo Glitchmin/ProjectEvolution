@@ -69,8 +69,8 @@ public class App extends Application implements IPositionChangeObserver {
         gridPane.getChildren().clear();
 
 
-        Vector2d mapUpperRight = map.wymiary()[1];
-        Vector2d mapLowerLeft = map.wymiary()[0];
+        Vector2d mapUpperRight = new Vector2d(AbstractWorldMap.getWidth(), AbstractWorldMap.getHeight());
+        Vector2d mapLowerLeft = new Vector2d(0,0);
         Object[][] mapCopy = map.copy();
 
         addCenteredLabel(gridPane, "y/x",0,0);
@@ -97,14 +97,6 @@ public class App extends Application implements IPositionChangeObserver {
 
     @Override
     public void init() {
-        try {
-            map = new RectangularMap(10,10);
-
-
-        } catch (IllegalArgumentException ex) {
-            out.println(ex);
-        }
-
 
     }
 
@@ -121,6 +113,7 @@ public class App extends Application implements IPositionChangeObserver {
 
         buttonStart.setOnAction(actionEvent -> {
             getParamsFromMenuTextFields();
+            map = new WalledMap();
             Platform.runLater(this::updateView);
         });
 
@@ -144,7 +137,7 @@ public class App extends Application implements IPositionChangeObserver {
          menuTextFields = new ArrayList<>();
 
         for (int i=0; i<5;i++){
-            TextField intParamTextField = new TextField(new Integer[]{40,40,100,1,10}[i].toString());
+            TextField intParamTextField = new TextField(new Integer[]{9,9,100,1,10}[i].toString());
             gridPane.add(new HBox(new Label(intParamNames[i]),intParamTextField),0,i,1,1);
             menuTextFields.add(intParamTextField);
         }

@@ -8,7 +8,6 @@ import java.util.List;
 import static java.lang.System.out;
 
 public class SimulationEngine implements IEngine, Runnable {
-    MoveDirection[] directions;
     IWorldMap map;
     final List<Vector2d> animals_positions = new ArrayList<>();
     final List<IPositionChangeObserver> observers = new ArrayList<>();
@@ -23,7 +22,6 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     public SimulationEngine(IWorldMap map, Vector2d[] positions) {
-        map.clearAnimals();
         for (Vector2d position : positions) {
             Animal animal = new Animal(map, position);
             map.place(animal);
@@ -41,19 +39,9 @@ public class SimulationEngine implements IEngine, Runnable {
 
 
     public void run() {
-        int i = 0;
-        out.println(directions.length);
-        for (MoveDirection movdir : directions) {
-            out.println(movdir);
+        while (true){
             out.println(map);
-            Vector2d oldposition = new Vector2d(animals_positions.get(i % animals_positions.size()).x,animals_positions.get(i % animals_positions.size()).y) ;
-            out.println("test");
-            Animal animal = (Animal) map.objectAt(animals_positions.get(i % animals_positions.size()));
-            out.println("test2");
-            animal.move(movdir);
-            animals_positions.set(i % animals_positions.size(), animal.getPosition());
-            positionChanged(oldposition,animals_positions.get(i % animals_positions.size()), animal );
-            i++;
+
             try {
                 Thread.sleep(moveDelayMs);
             } catch (InterruptedException e) {
@@ -61,11 +49,6 @@ public class SimulationEngine implements IEngine, Runnable {
                 e.printStackTrace();
             }
         }
-        out.println("koniec symulacji");
-        out.println(map);
     }
 
-    public void setDirections(MoveDirection[] directions) {
-        this.directions = directions;
-    }
 }

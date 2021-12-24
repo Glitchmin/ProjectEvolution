@@ -86,13 +86,13 @@ public class Animal implements IMapElement {
     }
 
 
-    public void move(MoveDirection direction) {
+    public void move() {
         Vector2d przem = new Vector2d(0, 0);
+        MoveDirection direction = MoveDirection.values()[genotype[new Random().nextInt(32)]];
         switch (direction) {
-            case RIGHT -> this.direction = this.direction.next();
-            case LEFT -> this.direction = this.direction.previous();
             case FORWARD -> przem = przem.add(this.direction.toUnitVector());
             case BACKWARD -> przem = przem.subtract(this.direction.toUnitVector());
+            default -> this.direction = this.direction.turnRightBy(direction.ordinal());
         }
         ;
 
