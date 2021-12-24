@@ -35,7 +35,7 @@ abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObse
 
     @Override
     public boolean isOccupied(Vector2d position) {
-        return objectAt(position) != null;
+        return mapObjectsHandler.isOccupied(position);
     }
 
 
@@ -87,6 +87,8 @@ abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     public void removeGrass(Vector2d position){
         mapObjectsHandler.removeGrass(position);
     }
+
+
 
 
 

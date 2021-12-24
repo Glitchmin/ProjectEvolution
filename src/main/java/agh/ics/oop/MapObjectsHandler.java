@@ -42,6 +42,19 @@ public class MapObjectsHandler implements IPositionChangeObserver {
         add(newPosition, object);
     }
 
+    public boolean isOccupied(Vector2d position){
+        if (objectPositions.get(position)==null) {
+            return false;
+        }else{
+            for (IMapElement iMapElement: objectPositions.get(position)){
+                if (iMapElement instanceof Animal){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public List<IMapElement> objectAt(Vector2d position) {
         return objectPositions.get(position);
     }
@@ -58,7 +71,7 @@ public class MapObjectsHandler implements IPositionChangeObserver {
     }
 
     public boolean addGrass(Vector2d position) {
-        if (getGrassAtPos(position)!=null){
+        if (objectPositions.get(position) != null){
             return false;
         }
         grassPositionsList.add(position);

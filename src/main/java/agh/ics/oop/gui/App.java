@@ -80,7 +80,7 @@ public class App extends Application implements IPositionChangeObserver {
         Button buttonStart = new Button("Go!");
 
         buttonStart.setOnAction(actionEvent -> {
-            Vector2d[] positions = {new Vector2d(2, 2)};
+            Vector2d[] positions = {new Vector2d(2, 2), new Vector2d(2,2)};
             engine = new SimulationEngine(map, positions);
             engineThread = new Thread(engine);
             engine.addObserver(this);

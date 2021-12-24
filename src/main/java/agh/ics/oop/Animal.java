@@ -13,7 +13,7 @@ public class Animal implements IMapElement {
     private final IWorldMap map;
     final List<IPositionChangeObserver> observers = new ArrayList<>();
     private int energy;
-    final int [] genotype;
+    final private int [] genotype;
 
     static private int startEnergy;
     static private int moveEnergy;
@@ -53,18 +53,53 @@ public class Animal implements IMapElement {
         energy+=energyGiven;
     }
 
-    public Animal(IWorldMap map, Vector2d initialPos) {
+    public void subtractMoveEnergy(){
+        energy-=moveEnergy;
+    }
+
+    public Animal(Animal parent1, Animal parent2){
+        this.position = new Vector2d(parent1.getPosition().getX(), parent1.getPosition().getY());
+        Random rn = new Random();
+        this.direction = MapDirection.values()[rn.nextInt(8)];
+        this.map = parent1.map;
+        this.energy = parent1.energy/4 + parent2.energy/4;
+        parent1.energy -= parent1.energy/4;
+        parent2.energy -= parent2.energy/4;
+        boolean doesP1GetRightSide = rn.nextBoolean();
+        int howManyGenesDoesP1Give = (32* parent1.energy)/(parent1.energy+ parent2.energy);
+        this.genotype=new int[32];
+        if (!doesP1GetRightSide){
+            System.arraycopy(parent1.genotype, 0, this.genotype, 0, howManyGenesDoesP1Give);
+            System.arraycopy(parent2.genotype, howManyGenesDoesP1Give, this.genotype, howManyGenesDoesP1Give, 32-howManyGenesDoesP1Give);
+        }else{
+            System.arraycopy(parent2.genotype, 0, this.genotype, 0, 32-howManyGenesDoesP1Give);
+            System.arraycopy(parent1.genotype, 32-howManyGenesDoesP1Give, this.genotype, 32-howManyGenesDoesP1Give, howManyGenesDoesP1Give);
+        }
+        /*out.print(parent1.energy);
+        out.print(" ");
+        out.print(parent2.energy);
+        out.print(" ");
+        out.println(doesP1GetRightSide);
+
+        out.println(Arrays.toString(parent1.genotype));
+        out.println(Arrays.toString(parent2.genotype));
+        out.println(Arrays.toString(this.genotype));
+        Arrays.sort(this.genotype);
+        out.print("zwierzak powstal na skutek SEXU haha");
+        out.println(Arrays.toString(this.genotype));*/
+    }
+
+    public Animal(AbstractWorldMap map, Vector2d initialPos) {
         this.position = initialPos;
         this.direction = MapDirection.NORTH;
         this.map = map;
 
-        this.energy = new Random().nextInt(startEnergy);
+        this.energy = new Random().nextInt(startEnergy/2)+startEnergy/2;
         this.genotype = new int[32];
         Random rn = new Random();
         for (int i=0; i<32;i++){
             genotype[i]=rn.nextInt(8);
         }
-        out.println("utworzono zwierzaka");
         Arrays.sort(genotype);
         out.println(Arrays.toString(genotype));
     }

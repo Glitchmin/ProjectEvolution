@@ -23,9 +23,8 @@ public class GuiElementBox {
         imageView.setFitWidth(20);
         imageView.setFitHeight(20);
         if (element instanceof Animal) {
-            ColorAdjust colorAdjust = new ColorAdjust();
-            colorAdjust.setSaturation(((Animal) element).getEnergySaturation());
-            imageView.setEffect(colorAdjust);
+            imageView.setOpacity(((Animal) element).getEnergySaturation());
+            text=Double.toString(((Animal) element).getEnergySaturation());
         }
         vBox = new VBox(imageView,new Label(text));
         vBox.setPrefHeight(20);

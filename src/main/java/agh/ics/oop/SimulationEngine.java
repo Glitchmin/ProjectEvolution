@@ -1,5 +1,7 @@
 package agh.ics.oop;
 
+import javafx.util.Pair;
+
 import java.util.*;
 
 import static java.lang.System.out;
@@ -32,7 +34,8 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     private void removeDeadAnimals() {
-        for (Animal animal : map.getAliveAnimals()) {
+        List<Animal> animalListCopy = new Vector<>(map.getAliveAnimals());
+        for (Animal animal : animalListCopy) {
             if (animal.isOutOfEnergy()) {
                 map.removeAnimal(animal);
                 map.getAliveAnimals().remove(animal);
@@ -42,6 +45,7 @@ public class SimulationEngine implements IEngine, Runnable {
 
     private void moveAllAnimals() {
         for (Animal animal : map.getAliveAnimals()) {
+            animal.subtractMoveEnergy();
             animal.move();
         }
     }
@@ -95,13 +99,41 @@ public class SimulationEngine implements IEngine, Runnable {
         map.addGrasses();
     }
 
+    private Pair <Animal,Animal> get2StrongestAnimalsAtPos(SortedMap<Vector2d, List<IMapElement>> objectPositions, Vector2d position){
+        Animal strongestAnimal = null;
+        Animal secondStrongestAnimal = null;
+        for (IMapElement mapElement : objectPositions.get(position)) {
+            if (mapElement instanceof Animal) {
+                if(strongestAnimal == null){
+                    strongestAnimal = (Animal)mapElement;
+                }else{
+                    if (((Animal) mapElement).getEnergy() >= strongestAnimal.getEnergy()){
+                        secondStrongestAnimal = strongestAnimal;
+                        strongestAnimal = (Animal) mapElement;
+                    }
+                }
+            }
+        }
+        return new Pair<> (strongestAnimal, secondStrongestAnimal);
+    }
+
+    private void reproduceAllAnimals(){
+        for (Vector2d position:map.getObjectPositions().keySet()){
+            Pair<Animal, Animal> animalsInLoveUwU = get2StrongestAnimalsAtPos(map.getObjectPositions(),position);
+            if (animalsInLoveUwU.getValue() != null && animalsInLoveUwU.getValue().getEnergy() > Animal.getStartEnergy()/2){
+                map.place(new Animal(animalsInLoveUwU.getKey(), animalsInLoveUwU.getValue()));
+                out.println("powinny sie ruchac");
+            }
+        }
+    }
+
     public void run() {
         while (true) {
             out.println(map);
             removeDeadAnimals();
             moveAllAnimals();
             feedAllAnimals();
-            //hehe sex here
+            reproduceAllAnimals();
             addGrassToMap();
 
             positionChanged(new Vector2d(0, 0), new Vector2d(1, 1), null);
