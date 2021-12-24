@@ -43,12 +43,22 @@ public class Animal implements IMapElement {
         Animal.plantEnergy = plantEnergy;
     }
 
+    public boolean isOutOfEnergy(){ return energy < 0; }
+
+    public int getEnergy() {
+        return energy;
+    }
+
+    public void giveEnergy(int energyGiven){
+        energy+=energyGiven;
+    }
+
     public Animal(IWorldMap map, Vector2d initialPos) {
         this.position = initialPos;
         this.direction = MapDirection.NORTH;
         this.map = map;
 
-        this.energy = new Random().nextInt()%startEnergy;
+        this.energy = new Random().nextInt(startEnergy);
         this.genotype = new int[32];
         Random rn = new Random();
         for (int i=0; i<32;i++){
@@ -69,7 +79,7 @@ public class Animal implements IMapElement {
     }
 
     public String toString() {
-        return "a";
+        return Integer.toString(energy);
     }
 
     public MapDirection getDirection() {
@@ -87,18 +97,24 @@ public class Animal implements IMapElement {
 
 
     public void move() {
-        Vector2d przem = new Vector2d(0, 0);
-        MoveDirection direction = MoveDirection.values()[genotype[new Random().nextInt(32)]];
+        Vector2d moveVector = new Vector2d(0, 0);
+        int direction = genotype[new Random().nextInt(32)];
+        out.print(direction);
+        out.print(" ");
+        out.print(energy);
+        out.print(position);
+        out.print(" ");
         switch (direction) {
-            case FORWARD -> przem = przem.add(this.direction.toUnitVector());
-            case BACKWARD -> przem = przem.subtract(this.direction.toUnitVector());
-            default -> this.direction = this.direction.turnRightBy(direction.ordinal());
+            case 0 -> moveVector = moveVector.add(this.direction.toUnitVector());
+            case 4 -> moveVector = moveVector.subtract(this.direction.toUnitVector());
+            default -> this.direction = this.direction.turnRightBy(direction);
         }
         ;
+        out.println(this.direction);
 
-        if (map.canMoveTo(this.position.add(przem))) {
-            positionChanged(this.position, this.position.add(przem), this);
-            this.position = this.position.add(przem);
+        if (map.canMoveTo(this.position.add(moveVector))) {
+            positionChanged(this.position, this.position.add(moveVector), this);
+            this.position = this.position.add(moveVector);
         }
 
     }

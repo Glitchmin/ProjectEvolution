@@ -26,12 +26,12 @@ public class App extends Application implements IPositionChangeObserver {
     private Thread engineThread;
     private List<TextField> menuTextFields;
 
-    private void addConstraintsForColumns(GridPane gridPane, Vector2d mapUpperRight, Vector2d mapLowerLeft) {
-        for (int y = mapUpperRight.getY() + 1; y >= mapLowerLeft.getY(); y--) {
+    private void addConstraintsForColumns(GridPane gridPane, Vector2d mapUpperRight) {
+        for (int y = mapUpperRight.getY() + 1; y >= 0; y--) {
             gridPane.getRowConstraints().add(new RowConstraints(40));
         }
 
-        for (int x = mapLowerLeft.getX(); x <= mapUpperRight.getX() + 1; x++) {
+        for (int x = 0; x <= mapUpperRight.getX() + 1; x++) {
             gridPane.getColumnConstraints().add(new ColumnConstraints(40));
         }
     }
@@ -43,55 +43,51 @@ public class App extends Application implements IPositionChangeObserver {
 
     }
 
-    private void addObjectsAndYLabels(Object[][] mapCopy, GridPane gridPane, Vector2d mapUpperRight, Vector2d mapLowerLeft) {
-        for (int y = mapUpperRight.getY(); y >= mapLowerLeft.getY(); y--) {
+    private void addYLabels(GridPane gridPane, Vector2d mapUpperRight) {
+        for (int y = mapUpperRight.getY(); y >= 0; y--) {
             addCenteredLabel(gridPane, Integer.toString(y), 0, (mapUpperRight.getY() - y) + 1);
-            for (int x = mapLowerLeft.getX(); x <= mapUpperRight.getX(); x++) {
-                if (mapCopy[x - mapLowerLeft.getX()][y - mapLowerLeft.getY()] != null) {
-                    try {
-                        gridPane.add(new GuiElementBox((IMapElement) mapCopy[x - mapLowerLeft.getX()][y - mapLowerLeft.getY()], new Vector2d(x, y).toString()).getVBox(), x - mapLowerLeft.getX() + 1, (mapUpperRight.getY() - y) + 1, 1, 1);
-                    } catch (java.io.FileNotFoundException ex) {
-                        out.println(ex);
-                    }
-                }
-            }
         }
     }
 
-    private void addXLabels(GridPane gridPane, Vector2d mapUpperRight, Vector2d mapLowerLeft) {
-        for (int x = mapLowerLeft.getX(); x <= mapUpperRight.getX(); x++) {
-            addCenteredLabel(gridPane, Integer.toString(x), x - mapLowerLeft.getX() + 1, 0);
+
+    private void addXLabels(GridPane gridPane, Vector2d mapUpperRight) {
+        for (int x = 0; x <= mapUpperRight.getX(); x++) {
+            addCenteredLabel(gridPane, Integer.toString(x), x + 1, 0);
         }
     }
 
     private void updateView() {
 
         gridPane.getChildren().clear();
-
-
+        gridPane.setGridLinesVisible(true);
         Vector2d mapUpperRight = new Vector2d(AbstractWorldMap.getWidth(), AbstractWorldMap.getHeight());
-        Vector2d mapLowerLeft = new Vector2d(0,0);
-        Object[][] mapCopy = map.copy();
+        List<IMapElement> mapCopy = map.getCopyOfMapElements();
 
-        addCenteredLabel(gridPane, "y/x",0,0);
+        addCenteredLabel(gridPane, "y/x", 0, 0);
 
-        addXLabels(gridPane, mapUpperRight, mapLowerLeft);
-        addObjectsAndYLabels(mapCopy, gridPane, mapUpperRight, mapLowerLeft);
-        addConstraintsForColumns(gridPane, mapUpperRight, mapLowerLeft);
+        addXLabels(gridPane, mapUpperRight);
+        addYLabels(gridPane, mapUpperRight);
+        addConstraintsForColumns(gridPane, mapUpperRight);
+
+        for (IMapElement mapElement: mapCopy){
+            try {
+                gridPane.add(new GuiElementBox(mapElement,mapElement.getPosition().toString()).getVBox(),mapElement.getPosition().getX()+1,AbstractWorldMap.getHeight() - mapElement.getPosition().getY()+1,1,1);
+            }catch (java.io.FileNotFoundException ex){
+                out.println(ex);
+            }
+        }
 
         Button buttonStart = new Button("Go!");
 
         buttonStart.setOnAction(actionEvent -> {
-            Vector2d[] positions = {new Vector2d(2, 2), new Vector2d(2, 3)};
+            Vector2d[] positions = {new Vector2d(2, 2)};
             engine = new SimulationEngine(map, positions);
             engineThread = new Thread(engine);
             engine.addObserver(this);
             engineThread.start();
         });
-        gridPane.setGridLinesVisible(true);
-        gridPane.add(new HBox(buttonStart), 0, -mapLowerLeft.getY() + mapUpperRight.getY() + 4, 10, 1);
-
-
+        gridPane.add(new HBox(buttonStart), 0, mapUpperRight.getY() + 4, 10, 1);
+        out.println(gridPane.gridLinesVisibleProperty());
         primaryStage.show();
     }
 
@@ -107,7 +103,7 @@ public class App extends Application implements IPositionChangeObserver {
         addParamFieldsToMenu();
 
         Button buttonStart = new Button("Start!");
-        gridPane.add(buttonStart,0,7,1,1);
+        gridPane.add(buttonStart, 0, 7, 1, 1);
         primaryStage.setScene(scene);
         Platform.runLater(primaryStage::show);
 
@@ -119,7 +115,7 @@ public class App extends Application implements IPositionChangeObserver {
 
     }
 
-    private void getParamsFromMenuTextFields(){
+    private void getParamsFromMenuTextFields() {
         AbstractWorldMap.setHeight(Integer.parseInt(menuTextFields.get(0).getText()));
         AbstractWorldMap.setWidth(Integer.parseInt(menuTextFields.get(1).getText()));
         Animal.setStartEnergy(Integer.parseInt(menuTextFields.get(2).getText()));
@@ -127,22 +123,22 @@ public class App extends Application implements IPositionChangeObserver {
         Animal.setPlantEnergy(Integer.parseInt(menuTextFields.get(4).getText()));
         AbstractWorldMap.setJungleRatio(Double.parseDouble(menuTextFields.get(5).getText()));
         out.println("test:");
-        for (int i=0; i<5;i++) {
+        for (int i = 0; i < 5; i++) {
             out.println(menuTextFields.get(i).getText());
         }
     }
 
     private void addParamFieldsToMenu() {
-        String [] intParamNames  = {"Width","Height","Start Energy","Move Energy","Plant Energy"};
-         menuTextFields = new ArrayList<>();
+        String[] intParamNames = {"Width", "Height", "Start Energy", "Move Energy", "Plant Energy"};
+        menuTextFields = new ArrayList<>();
 
-        for (int i=0; i<5;i++){
-            TextField intParamTextField = new TextField(new Integer[]{9,9,100,1,10}[i].toString());
-            gridPane.add(new HBox(new Label(intParamNames[i]),intParamTextField),0,i,1,1);
+        for (int i = 0; i < 5; i++) {
+            TextField intParamTextField = new TextField(new Integer[]{9, 9, 100, 1, 10}[i].toString());
+            gridPane.add(new HBox(new Label(intParamNames[i]), intParamTextField), 0, i, 1, 1);
             menuTextFields.add(intParamTextField);
         }
         TextField jungleParamTextField = new TextField("0.5");
-        gridPane.add(new HBox(new Label("Jungle Ratio"),jungleParamTextField),0,6,1,1);
+        gridPane.add(new HBox(new Label("Jungle Ratio"), jungleParamTextField), 0, 6, 1, 1);
         menuTextFields.add(jungleParamTextField);
 
 

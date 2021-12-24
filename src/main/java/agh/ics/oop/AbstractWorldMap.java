@@ -1,16 +1,10 @@
 package agh.ics.oop;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static java.lang.System.out;
+import java.util.*;
 
 abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
 
-    final MapBoundary mapBoundary = new MapBoundary();
+    final MapObjectsHandler mapObjectsHandler = new MapObjectsHandler();
     private static double jungleRatio;
     protected static int width;
     protected static int height;
@@ -46,19 +40,12 @@ abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObse
 
 
     public Object objectAt(Vector2d position) {
-        return mapBoundary.objectAt(position);
+        return mapObjectsHandler.objectAt(position);
     }
 
     
-    public Object[][] copy() {
-
-        Object[][] mapCopy = new Object[width + 1][height + 1];
-        for (int x = 0; x <= width; x++) {
-            for (int y = 0; y <= height; y++) {
-                mapCopy[x][y] = objectAt(new Vector2d(x, y));
-            }
-        }
-        return mapCopy;
+    public List<IMapElement> getCopyOfMapElements() {
+        return mapObjectsHandler.getMapElementsList();
     }
 
 
@@ -69,16 +56,36 @@ abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObse
 
     @Override
     public void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
-        mapBoundary.positionChanged(oldPosition, newPosition, object);
+        mapObjectsHandler.positionChanged(oldPosition, newPosition, object);
     }
 
-    public boolean place(Animal animal){
-        if (canMoveTo(animal.getPosition())) {
-            mapBoundary.add(animal.getPosition(), animal);
+    public void place(Animal animal){
+            mapObjectsHandler.addAnimal(animal);
             animal.addObserver(this);
-            return true;
+    }
+
+    public List<Animal> getAliveAnimals() {
+        return mapObjectsHandler.getAliveAnimals();
+    }
+
+    public void removeAnimal (Animal animal){
+        mapObjectsHandler.removeAnimal(animal);
+    }
+
+    public SortedMap<Vector2d, List<IMapElement>> getObjectPositions() {
+        return mapObjectsHandler.getObjectPositions();
+    }
+
+    public void addGrasses(){
+        Random rn = new Random();
+        Vector2d position = new Vector2d(rn.nextInt(width+1), rn.nextInt(height+1) );
+        while(!mapObjectsHandler.addGrass(position)){
+            position = new Vector2d(rn.nextInt(width+1), rn.nextInt(height+1) );
         }
-        return false;
+    }
+
+    public void removeGrass(Vector2d position){
+        mapObjectsHandler.removeGrass(position);
     }
 
 
