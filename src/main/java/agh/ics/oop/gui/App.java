@@ -23,10 +23,8 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
     private GridPane gridPaneOfEverything;
     private Stage primaryStage;
     private SimulationEngine engine;
-    private Thread engineThread;
     private List<TextField> menuTextFields;
     private SimulationVisualizer simulationVisualizer;
-    private Label animalsAliveLabel;
 
 
     private Label addCenteredLabel(GridPane gridPane, String text, int x, int y) {
@@ -72,11 +70,10 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         gridPaneOfEverything.add(simulationVisualizer.getSimulationGridPane(), 0, 0, 1, 1);
         Button buttonPause = new Button("Pause/Play");
         gridPaneOfEverything.add(new HBox(buttonPause), 0, 1, 1, 1);
-        animalsAliveLabel = new Label(Integer.toString(engine.getAliveAnimalsCounter()));
-        gridPaneOfEverything.add(animalsAliveLabel,0,2);
+        gridPaneOfEverything.add(engine.getAvgAliveAnimalsCounterLineChart(),0,2);
         engine.addPositionObserver(this);
         engine.addDayObserver(this);
-        engineThread = new Thread(engine);
+        Thread engineThread = new Thread(engine);
         engineThread.start();
         return buttonPause;
     }
@@ -113,7 +110,7 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
 
     public void start(Stage primaryStage) {
         gridPaneOfEverything = new GridPane();
-        Scene scene = new Scene(gridPaneOfEverything, 1400, 700);
+        Scene scene = new Scene(gridPaneOfEverything, 1400, 800);
         primaryStage.setScene(scene);
         this.primaryStage = primaryStage;
         Platform.runLater(primaryStage::show);
@@ -123,6 +120,7 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
     @Override
     public void newDayHasCome() {
         Platform.runLater(this::updateView);
+        Platform.runLater(engine.statisticsEngine::newDayHasCome);
     }
 
     private void updateView() {
@@ -130,9 +128,7 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         Platform.runLater(primaryStage::show);
         Platform.runLater(simulationVisualizer);
         out.println(engine.getAliveAnimalsCounter());
-        gridPaneOfEverything.getChildren().remove(animalsAliveLabel);
-        animalsAliveLabel=new Label(Integer.toString(engine.getAliveAnimalsCounter()));
-        gridPaneOfEverything.add(animalsAliveLabel,0,2);
+
     }
 
     @Override

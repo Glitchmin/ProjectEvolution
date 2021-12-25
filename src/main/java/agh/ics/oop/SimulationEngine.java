@@ -1,5 +1,7 @@
 package agh.ics.oop;
 
+import javafx.application.Platform;
+import javafx.scene.chart.LineChart;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -8,9 +10,9 @@ import static java.lang.System.out;
 
 public class SimulationEngine implements IEngine, Runnable {
     AbstractWorldMap map;
-    Integer moveDelayMs = 300;
+    Integer moveDelayMs = 50;
     boolean isPaused = false;
-    StatisticsEngine statisticsEngine;
+    public StatisticsEngine statisticsEngine;
 
     @Override
     public void addDayObserver(IDayChangeObserver observer) {
@@ -61,10 +63,16 @@ public class SimulationEngine implements IEngine, Runnable {
         List<Animal> animalListCopy = new Vector<>(map.getAliveAnimals());
         for (Animal animal : animalListCopy) {
             if (animal.isOutOfEnergy()) {
+                out.println("zwierzak out of energy"+animal.getEnergy());
                 map.removeAnimal(animal);
                 map.getAliveAnimals().remove(animal);
             }
         }
+        Platform.runLater(statisticsEngine);
+    }
+
+    public LineChart<Number, Number> getAvgAliveAnimalsCounterLineChart() {
+        return statisticsEngine.getAvgAliveAnimalsCounterLineChart();
     }
 
     private void moveAllAnimals() {
@@ -174,7 +182,6 @@ public class SimulationEngine implements IEngine, Runnable {
                 reproduceAllAnimals();
                 addGrassToMap();
                 newDayHasCome();
-
 
                 try {
                     Thread.sleep(moveDelayMs);

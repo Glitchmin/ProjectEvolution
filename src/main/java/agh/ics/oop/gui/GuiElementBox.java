@@ -41,6 +41,9 @@ public class GuiElementBox {
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(width);
         imageView.setFitHeight(height);
+        if (element instanceof Animal) {
+            imageView.setOpacity(((Animal) element).getEnergySaturation());
+        }
         vBox = new VBox(imageView);
         vBox.setPrefHeight(width);
         vBox.setPrefWidth(height);
