@@ -6,8 +6,15 @@ import java.util.List;
 public class WalledMap extends AbstractWorldMap {
 
     public boolean canMoveTo(Vector2d position) {
-        return (position.x <= width && position.x >= 0 && position.y >= 0 && position.y <= height);
+        return (position.getX() <= width && position.getX() >= 0 && position.getY() >= 0 && position.getY() <= height);
     }
 
-
+    @Override
+    public Vector2d positonAfterMove(Vector2d oldPosition, Vector2d moveVector) {
+        if (canMoveTo(oldPosition.add(moveVector))){
+            return oldPosition.add(moveVector);
+        }else{
+            return oldPosition;
+        }
+    }
 }

@@ -10,7 +10,7 @@ import static java.lang.System.out;
 public class Animal implements IMapElement {
     private Vector2d position;
     private MapDirection direction;
-    private final IWorldMap map;
+    private final AbstractWorldMap map;
     final List<IPositionChangeObserver> observers = new ArrayList<>();
     private int energy;
     final private int [] genotype;
@@ -122,12 +122,12 @@ public class Animal implements IMapElement {
     }
 
     public Vector2d getPosition() {
-        return new Vector2d(this.position.x, this.position.y);
+        return new Vector2d(this.position.getX(), this.position.getY());
     }
 
 
     public boolean isAt(Vector2d position) {
-        return (this.position.x == position.x && this.position.y == position.y);
+        return (this.position.equals(position));
     }
 
 
@@ -147,10 +147,8 @@ public class Animal implements IMapElement {
         ;
         out.println(this.direction);
 
-        if (map.canMoveTo(this.position.add(moveVector))) {
-            positionChanged(this.position, this.position.add(moveVector), this);
-            this.position = this.position.add(moveVector);
-        }
+        positionChanged(this.position, map.positonAfterMove(position,moveVector), this);
+        this.position = map.positonAfterMove(position,moveVector);
 
     }
 

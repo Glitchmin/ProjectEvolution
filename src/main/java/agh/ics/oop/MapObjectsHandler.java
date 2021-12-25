@@ -7,17 +7,17 @@ import static java.lang.System.out;
 public class MapObjectsHandler implements IPositionChangeObserver {
 
     Comparator<Vector2d> vector2dComparator = (a, b) -> {
-        if (a.x == b.x && a.y == b.y) {
+        if (a.getX() == b.getX() && a.getY() == b.getY()) {
             return 0;
         }
-        if (a.x == b.x) {
-            if (a.y > b.y) {
+        if (a.getX() == b.getX()) {
+            if (a.getY() > b.getY()) {
                 return 1;
             } else {
                 return -1;
             }
         }
-        if (a.x > b.x) {
+        if (a.getX() > b.getX()) {
             return 1;
         } else {
             return -1;

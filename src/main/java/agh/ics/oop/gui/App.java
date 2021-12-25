@@ -109,7 +109,7 @@ public class App extends Application implements IPositionChangeObserver {
 
         buttonStart.setOnAction(actionEvent -> {
             getParamsFromMenuTextFields();
-            map = new WalledMap();
+            map = new WrappingMap();
             Platform.runLater(this::updateView);
         });
 

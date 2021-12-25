@@ -2,7 +2,7 @@ package agh.ics.oop;
 
 import java.util.*;
 
-abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
+abstract public class AbstractWorldMap implements IPositionChangeObserver {
 
     final MapObjectsHandler mapObjectsHandler = new MapObjectsHandler();
     private static double jungleRatio;
@@ -33,7 +33,6 @@ abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         AbstractWorldMap.height = height;
     }
 
-    @Override
     public boolean isOccupied(Vector2d position) {
         return mapObjectsHandler.isOccupied(position);
     }
@@ -88,7 +87,7 @@ abstract public class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         mapObjectsHandler.removeGrass(position);
     }
 
-
+    public abstract Vector2d positonAfterMove(Vector2d oldPosition, Vector2d moveVector);
 
 
 

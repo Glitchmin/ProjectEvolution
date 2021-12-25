@@ -122,7 +122,6 @@ public class SimulationEngine implements IEngine, Runnable {
             Pair<Animal, Animal> animalsInLoveUwU = get2StrongestAnimalsAtPos(map.getObjectPositions(),position);
             if (animalsInLoveUwU.getValue() != null && animalsInLoveUwU.getValue().getEnergy() > Animal.getStartEnergy()/2){
                 map.place(new Animal(animalsInLoveUwU.getKey(), animalsInLoveUwU.getValue()));
-                out.println("powinny sie ruchac");
             }
         }
     }
