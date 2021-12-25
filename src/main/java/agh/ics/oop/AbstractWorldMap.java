@@ -38,7 +38,7 @@ abstract public class AbstractWorldMap implements IPositionChangeObserver {
     }
 
 
-    public Object objectAt(Vector2d position) {
+    public List<IMapElement> objectsAt(Vector2d position) {
         return mapObjectsHandler.objectAt(position);
     }
 
@@ -77,9 +77,9 @@ abstract public class AbstractWorldMap implements IPositionChangeObserver {
 
     public void addGrasses(){
         Random rn = new Random();
-        Vector2d position = new Vector2d(rn.nextInt(width+1), rn.nextInt(height+1) );
+        Vector2d position = new Vector2d(rn.nextInt(width), rn.nextInt(height) );
         while(!mapObjectsHandler.addGrass(position)){
-            position = new Vector2d(rn.nextInt(width+1), rn.nextInt(height+1) );
+            position = new Vector2d(rn.nextInt(width), rn.nextInt(height) );
         }
     }
 

@@ -1,5 +1,6 @@
 package agh.ics.oop;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 public class Vector2d {
@@ -65,4 +66,22 @@ public class Vector2d {
     public int getY() {
         return y;
     }
+
+    public static Comparator<Vector2d> xFirstComparator = (a, b) -> {
+        if (a.getX() == b.getX() && a.getY() == b.getY()) {
+            return 0;
+        }
+        if (a.getX() == b.getX()) {
+            if (a.getY() > b.getY()) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
+        if (a.getX() > b.getX()) {
+            return 1;
+        } else {
+            return -1;
+        }
+    };
 }

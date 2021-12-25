@@ -6,7 +6,7 @@ public class WrappingMap extends AbstractWorldMap{
 
     public Vector2d positionAfterMove(Vector2d oldPosition, Vector2d moveVector) {
         Vector2d newPosition = oldPosition.add(moveVector);
-            return new Vector2d((newPosition.x+width+1)%(width+1), (newPosition.y+height+1)%(height+1));
+            return new Vector2d((newPosition.x+width)%(width), (newPosition.y+height)%(height));
 
     }
 }

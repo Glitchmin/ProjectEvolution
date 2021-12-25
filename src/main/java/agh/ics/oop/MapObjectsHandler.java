@@ -2,29 +2,11 @@ package agh.ics.oop;
 
 import java.util.*;
 
-import static java.lang.System.out;
-
 public class MapObjectsHandler implements IPositionChangeObserver {
 
-    Comparator<Vector2d> vector2dComparator = (a, b) -> {
-        if (a.getX() == b.getX() && a.getY() == b.getY()) {
-            return 0;
-        }
-        if (a.getX() == b.getX()) {
-            if (a.getY() > b.getY()) {
-                return 1;
-            } else {
-                return -1;
-            }
-        }
-        if (a.getX() > b.getX()) {
-            return 1;
-        } else {
-            return -1;
-        }
-    };
 
-    SortedMap<Vector2d, List<IMapElement>> objectPositions = new TreeMap<>(vector2dComparator);
+
+    SortedMap<Vector2d, List<IMapElement>> objectPositions = new TreeMap<>(Vector2d.xFirstComparator);
     List<Animal> aliveAnimals = new Vector<>();
     List<Vector2d> grassPositionsList = new Vector<>();
 

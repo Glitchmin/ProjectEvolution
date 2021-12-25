@@ -134,18 +134,12 @@ public class Animal implements IMapElement {
     public void move() {
         Vector2d moveVector = new Vector2d(0, 0);
         int direction = genotype[new Random().nextInt(32)];
-        out.print(direction);
-        out.print(" ");
-        out.print(energy);
-        out.print(position);
-        out.print(" ");
         switch (direction) {
             case 0 -> moveVector = moveVector.add(this.direction.toUnitVector());
             case 4 -> moveVector = moveVector.subtract(this.direction.toUnitVector());
             default -> this.direction = this.direction.turnRightBy(direction);
         }
         ;
-        out.println(this.direction);
 
         positionChanged(this.position, map.positionAfterMove(position,moveVector), this);
         this.position = map.positionAfterMove(position,moveVector);

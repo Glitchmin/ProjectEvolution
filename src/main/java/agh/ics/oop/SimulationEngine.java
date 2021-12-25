@@ -8,24 +8,35 @@ import static java.lang.System.out;
 
 public class SimulationEngine implements IEngine, Runnable {
     AbstractWorldMap map;
-    final List<IPositionChangeObserver> observers = new ArrayList<>();
     Integer moveDelayMs = 300;
 
-    public void addObserver(IPositionChangeObserver observer) {
-        this.observers.add(observer);
+    @Override
+    public void addDayObserver(IDayChangeObserver observer) {
+        dayObservers.add(observer);
     }
 
-    public void removeObserver(IPositionChangeObserver observer) {
-        this.observers.remove(observer);
+    @Override
+    public void removeDayObserver(IDayChangeObserver observer) {
+        dayObservers.remove(observer);
+    }
+
+    @Override
+    public void addPositionObserver(IPositionChangeObserver observer) {
+        positionObservers.add(observer);
+    }
+
+    @Override
+    public void removePositionObserver(IPositionChangeObserver observer) {
+        positionObservers.remove(observer);
     }
 
     public SimulationEngine(AbstractWorldMap map, int animalsAmount) {
         Random rn = new Random();
 
         for (int i=0; i<animalsAmount;i++){
-            Vector2d position = new Vector2d(rn.nextInt(AbstractWorldMap.getWidth()+1), rn.nextInt(AbstractWorldMap.getHeight()+1));
-            while (map.objectAt(position)!=null){
-                position = new Vector2d(rn.nextInt(AbstractWorldMap.getWidth()+1), rn.nextInt(AbstractWorldMap.getHeight()+1));
+            Vector2d position = new Vector2d(rn.nextInt(AbstractWorldMap.getWidth()), rn.nextInt(AbstractWorldMap.getHeight()));
+            while (map.objectsAt(position)!=null){
+                position = new Vector2d(rn.nextInt(AbstractWorldMap.getWidth()), rn.nextInt(AbstractWorldMap.getHeight()));
             }
             map.place(new Animal(map,position));
         }
@@ -33,8 +44,14 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     public void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
-        for (IPositionChangeObserver observer : observers) {
+        for (IPositionChangeObserver observer : positionObservers) {
             observer.positionChanged(oldPosition, newPosition, object);
+        }
+    }
+
+    public void newDayHasCome() {
+        for (IDayChangeObserver observer : dayObservers) {
+            observer.newDayHasCome();
         }
     }
 
@@ -51,7 +68,9 @@ public class SimulationEngine implements IEngine, Runnable {
     private void moveAllAnimals() {
         for (Animal animal : map.getAliveAnimals()) {
             animal.subtractMoveEnergy();
+            Vector2d oldPosition = new Vector2d(animal.getPosition().x, animal.getPosition().y);
             animal.move();
+            positionChanged(oldPosition, animal.getPosition(), animal);
         }
     }
 
@@ -139,8 +158,8 @@ public class SimulationEngine implements IEngine, Runnable {
             feedAllAnimals();
             reproduceAllAnimals();
             addGrassToMap();
+            newDayHasCome();
 
-            positionChanged(new Vector2d(0, 0), new Vector2d(1, 1), null);
 
             try {
                 Thread.sleep(moveDelayMs);

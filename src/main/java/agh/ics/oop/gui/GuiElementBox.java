@@ -11,24 +11,44 @@ import javafx.scene.layout.VBox;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GuiElementBox {
-    private Image image;
-    private ImageView imageView;
-    private VBox vBox;
+    private final VBox vBox;
+    static private int width;
+    static private int height;
+    static Map<String, Image> imagesMap=new HashMap<>();
 
-    public GuiElementBox(IMapElement element, String text) throws FileNotFoundException {
-        this.image = new Image(new FileInputStream(element.getResourcePath()));
-        imageView = new ImageView(image);
-        imageView.setFitWidth(20);
-        imageView.setFitHeight(20);
+    public static void setWidth(int width) {
+        GuiElementBox.width = width;
+    }
+
+    public static void setHeight(int height) {
+        GuiElementBox.height = height;
+    }
+
+    public GuiElementBox(IMapElement element) throws FileNotFoundException {
+        Image image;
+        if (imagesMap.get(element.getResourcePath())!=null){
+            image=imagesMap.get(element.getResourcePath());
+        }else {
+            image = new Image(new FileInputStream(element.getResourcePath()));
+            imagesMap.put(element.getResourcePath(), image);
+        }
+
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
+        String text = element.getPosition().toString();
         if (element instanceof Animal) {
             imageView.setOpacity(((Animal) element).getEnergySaturation());
             text=Double.toString(((Animal) element).getEnergySaturation());
         }
         vBox = new VBox(imageView,new Label(text));
-        vBox.setPrefHeight(20);
-        vBox.setPrefWidth(20);
+        vBox.setPrefHeight(width);
+        vBox.setPrefWidth(height);
         vBox.setAlignment(Pos.CENTER);
 
     }

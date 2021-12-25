@@ -17,86 +17,61 @@ import java.util.List;
 import static java.lang.System.out;
 
 
-public class App extends Application implements IPositionChangeObserver {
+public class App extends Application implements IDayChangeObserver, IPositionChangeObserver {
 
-    private AbstractWorldMap map;
-    private GridPane gridPane;
+    private GridPane gridPaneOfEverything;
     private Stage primaryStage;
     private SimulationEngine engine;
     private Thread engineThread;
     private List<TextField> menuTextFields;
+    private SimulationVisualizer simulationVisualizer;
 
-    private void addConstraintsForColumns(GridPane gridPane, Vector2d mapUpperRight) {
-        for (int y = mapUpperRight.getY() + 1; y >= 0; y--) {
-            gridPane.getRowConstraints().add(new RowConstraints(40));
-        }
 
-        for (int x = 0; x <= mapUpperRight.getX() + 1; x++) {
-            gridPane.getColumnConstraints().add(new ColumnConstraints(40));
-        }
-    }
 
-    private void addCenteredLabel(GridPane gridPane, String tekst, int x, int y) {
-        Label label = new Label(tekst);
+    private void addCenteredLabel(GridPane gridPane, String text, int x, int y) {
+        Label label = new Label(text);
         GridPane.setHalignment(label, HPos.CENTER);
         gridPane.add(label, x, y, 1, 1);
 
     }
 
-    private void updateView() {
-
-        gridPane.getChildren().clear();
-        gridPane.setGridLinesVisible(true);
-        Vector2d mapUpperRight = new Vector2d(AbstractWorldMap.getWidth(), AbstractWorldMap.getHeight());
-        List<IMapElement> mapCopy = map.getCopyOfMapElements();
-
-
-        addConstraintsForColumns(gridPane, mapUpperRight);
-
-        for (IMapElement mapElement: mapCopy){
-            try {
-                gridPane.add(new GuiElementBox(mapElement,mapElement.getPosition().toString()).getVBox(),mapElement.getPosition().x,AbstractWorldMap.getHeight() - mapElement.getPosition().y,1,1);
-            }catch (java.io.FileNotFoundException ex){
-                out.println(ex);
-            }
-        }
-
-        Button buttonStart = new Button("Go!");
-
-        buttonStart.setOnAction(actionEvent -> {
-            engine = new SimulationEngine(map, Integer.parseInt(menuTextFields.get(5).getText()));
-            engineThread = new Thread(engine);
-            engine.addObserver(this);
-            engineThread.start();
-        });
-        gridPane.add(new HBox(buttonStart), 0, mapUpperRight.getY() + 4, 10, 1);
-        out.println(gridPane.gridLinesVisibleProperty());
-        primaryStage.show();
-    }
 
     @Override
     public void init() {
-
     }
 
     private void renderMenu() {
-        gridPane = new GridPane();
-        Scene scene = new Scene(gridPane, 500, 500);
+        gridPaneOfEverything = new GridPane();
+        gridPaneOfEverything.getChildren().clear();
+        Scene scene = new Scene(gridPaneOfEverything, 1400, 700);
+        primaryStage.setScene(scene);
 
         addParamFieldsToMenu();
 
         Button buttonStart = new Button("Start!");
-        gridPane.add(buttonStart, 0, 7, 1, 1);
-        primaryStage.setScene(scene);
+        gridPaneOfEverything.add(buttonStart, 0, 7, 1, 1);
+
         Platform.runLater(primaryStage::show);
 
         buttonStart.setOnAction(actionEvent -> {
             getParamsFromMenuTextFields();
-            map = new WrappingMap();
-            Platform.runLater(this::updateView);
+            gridPaneOfEverything.getChildren().clear();
+            AbstractWorldMap map = new WrappingMap();
+
+
+            engine = new SimulationEngine(map, Integer.parseInt(menuTextFields.get(5).getText()));
+            simulationVisualizer = new SimulationVisualizer(map);
+            gridPaneOfEverything.add(simulationVisualizer.getSimulationGridPane(), 0, 0, 1, 1);
+            Button buttonPause = new Button("Pause/Play");
+            gridPaneOfEverything.add(new HBox(buttonPause), 0, 1, 1, 1);
+            engine.addPositionObserver(this);
+            engine.addDayObserver(this);
+            engineThread = new Thread(engine);
+            engineThread.start();
         });
 
     }
+
 
     private void getParamsFromMenuTextFields() {
         AbstractWorldMap.setHeight(Integer.parseInt(menuTextFields.get(0).getText()));
@@ -114,32 +89,37 @@ public class App extends Application implements IPositionChangeObserver {
     private void addParamFieldsToMenu() {
         String[] intParamNames = {"Width", "Height", "Start Energy", "Move Energy", "Plant Energy", "Amount of Animals"};
         menuTextFields = new ArrayList<>();
-        Integer[] intParamsDefaults = {9, 9, 100, 1, 10, 10};
+        Integer[] intParamsDefaults = {30, 30, 100, 1, 10, 10};
         for (int i = 0; i < 6; i++) {
             TextField intParamTextField = new TextField(intParamsDefaults[i].toString());
-            gridPane.add(new HBox(new Label(intParamNames[i]), intParamTextField), 0, i, 1, 1);
+            gridPaneOfEverything.add(new HBox(new Label(intParamNames[i]), intParamTextField), 0, i, 1, 1);
             menuTextFields.add(intParamTextField);
         }
         TextField jungleParamTextField = new TextField("0.5");
-        gridPane.add(new HBox(new Label("Jungle Ratio"), jungleParamTextField), 0, 6, 1, 1);
+        gridPaneOfEverything.add(new HBox(new Label("Jungle Ratio"), jungleParamTextField), 0, 6, 1, 1);
         menuTextFields.add(jungleParamTextField);
 
 
     }
 
     public void start(Stage primaryStage) {
-        gridPane = new GridPane();
-        Scene scene = new Scene(gridPane, 600, 700);
+        gridPaneOfEverything = new GridPane();
+        Scene scene = new Scene(gridPaneOfEverything, 1400, 700);
         primaryStage.setScene(scene);
         this.primaryStage = primaryStage;
         Platform.runLater(primaryStage::show);
         Platform.runLater(this::renderMenu);
     }
 
+    @Override
+    public void newDayHasCome() {
+        out.println("new day has come hmm");
+        Platform.runLater(primaryStage::show);
+        Platform.runLater(simulationVisualizer);
+    }
 
     @Override
     public void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
-        out.println("app position changed");
-        Platform.runLater(this::updateView);
+        //simulationVisualizer.positionChanged(oldPosition,newPosition,object);
     }
 }
