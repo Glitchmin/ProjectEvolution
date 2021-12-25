@@ -9,6 +9,8 @@ import static java.lang.System.out;
 public class SimulationEngine implements IEngine, Runnable {
     AbstractWorldMap map;
     Integer moveDelayMs = 300;
+    boolean isPaused = false;
+    StatisticsEngine statisticsEngine;
 
     @Override
     public void addDayObserver(IDayChangeObserver observer) {
@@ -32,7 +34,7 @@ public class SimulationEngine implements IEngine, Runnable {
 
     public SimulationEngine(AbstractWorldMap map, int animalsAmount) {
         Random rn = new Random();
-
+        statisticsEngine = new StatisticsEngine(map);
         for (int i=0; i<animalsAmount;i++){
             Vector2d position = new Vector2d(rn.nextInt(AbstractWorldMap.getWidth()), rn.nextInt(AbstractWorldMap.getHeight()));
             while (map.objectsAt(position)!=null){
@@ -119,6 +121,10 @@ public class SimulationEngine implements IEngine, Runnable {
         }
     }
 
+    public int getAliveAnimalsCounter(){
+        return statisticsEngine.getAliveAnimalsCounter();
+    }
+
     private void addGrassToMap(){
         map.addGrasses();
     }
@@ -150,22 +156,39 @@ public class SimulationEngine implements IEngine, Runnable {
         }
     }
 
+    public void pausePlayButtonPressed(){
+        isPaused=!isPaused;
+    }
+
+    private boolean isEveryoneDead(){
+        return getAliveAnimalsCounter()==0;
+    }
+
     public void run() {
-        while (true) {
-            out.println(map);
-            removeDeadAnimals();
-            moveAllAnimals();
-            feedAllAnimals();
-            reproduceAllAnimals();
-            addGrassToMap();
-            newDayHasCome();
+        while (!isEveryoneDead()) {
+            //out.println(map);
+            if (!isPaused) {
+                removeDeadAnimals();
+                moveAllAnimals();
+                feedAllAnimals();
+                reproduceAllAnimals();
+                addGrassToMap();
+                newDayHasCome();
 
 
-            try {
-                Thread.sleep(moveDelayMs);
-            } catch (InterruptedException e) {
-                out.println("Interrupted Threat Simulation Engine");
-                e.printStackTrace();
+                try {
+                    Thread.sleep(moveDelayMs);
+                } catch (InterruptedException e) {
+                    out.println("Interrupted Threat Simulation Engine");
+                    e.printStackTrace();
+                }
+            }else{
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    out.println("Interrupted Threat Simulation Engine");
+                    e.printStackTrace();
+                }
             }
         }
     }

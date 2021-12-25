@@ -89,6 +89,9 @@ abstract public class AbstractWorldMap implements IPositionChangeObserver {
 
     public abstract Vector2d positionAfterMove(Vector2d oldPosition, Vector2d moveVector);
 
+    public int getAliveAnimalCounter(){
+        return mapObjectsHandler.getAliveAnimals().size();
+    }
 
 
 }

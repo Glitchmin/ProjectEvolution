@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import javax.print.attribute.standard.MediaSize;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,14 +26,14 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
     private Thread engineThread;
     private List<TextField> menuTextFields;
     private SimulationVisualizer simulationVisualizer;
+    private Label animalsAliveLabel;
 
 
-
-    private void addCenteredLabel(GridPane gridPane, String text, int x, int y) {
+    private Label addCenteredLabel(GridPane gridPane, String text, int x, int y) {
         Label label = new Label(text);
         GridPane.setHalignment(label, HPos.CENTER);
         gridPane.add(label, x, y, 1, 1);
-
+        return label;
     }
 
 
@@ -54,22 +55,30 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         Platform.runLater(primaryStage::show);
 
         buttonStart.setOnAction(actionEvent -> {
-            getParamsFromMenuTextFields();
-            gridPaneOfEverything.getChildren().clear();
-            AbstractWorldMap map = new WrappingMap();
+            Button buttonPause = startASimulation();
 
-
-            engine = new SimulationEngine(map, Integer.parseInt(menuTextFields.get(5).getText()));
-            simulationVisualizer = new SimulationVisualizer(map);
-            gridPaneOfEverything.add(simulationVisualizer.getSimulationGridPane(), 0, 0, 1, 1);
-            Button buttonPause = new Button("Pause/Play");
-            gridPaneOfEverything.add(new HBox(buttonPause), 0, 1, 1, 1);
-            engine.addPositionObserver(this);
-            engine.addDayObserver(this);
-            engineThread = new Thread(engine);
-            engineThread.start();
+            buttonPause.setOnAction(actionEvent1 -> {
+                engine.pausePlayButtonPressed();
+            });
         });
+    }
 
+    private Button startASimulation() {
+        getParamsFromMenuTextFields();
+        gridPaneOfEverything.getChildren().clear();
+        AbstractWorldMap map = new WrappingMap();
+        engine = new SimulationEngine(map, Integer.parseInt(menuTextFields.get(5).getText()));
+        simulationVisualizer = new SimulationVisualizer(map);
+        gridPaneOfEverything.add(simulationVisualizer.getSimulationGridPane(), 0, 0, 1, 1);
+        Button buttonPause = new Button("Pause/Play");
+        gridPaneOfEverything.add(new HBox(buttonPause), 0, 1, 1, 1);
+        animalsAliveLabel = new Label(Integer.toString(engine.getAliveAnimalsCounter()));
+        gridPaneOfEverything.add(animalsAliveLabel,0,2);
+        engine.addPositionObserver(this);
+        engine.addDayObserver(this);
+        engineThread = new Thread(engine);
+        engineThread.start();
+        return buttonPause;
     }
 
 
@@ -113,9 +122,17 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
 
     @Override
     public void newDayHasCome() {
+        Platform.runLater(this::updateView);
+    }
+
+    private void updateView() {
         out.println("new day has come hmm");
         Platform.runLater(primaryStage::show);
         Platform.runLater(simulationVisualizer);
+        out.println(engine.getAliveAnimalsCounter());
+        gridPaneOfEverything.getChildren().remove(animalsAliveLabel);
+        animalsAliveLabel=new Label(Integer.toString(engine.getAliveAnimalsCounter()));
+        gridPaneOfEverything.add(animalsAliveLabel,0,2);
     }
 
     @Override

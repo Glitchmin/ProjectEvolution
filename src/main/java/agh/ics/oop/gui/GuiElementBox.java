@@ -41,12 +41,7 @@ public class GuiElementBox {
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(width);
         imageView.setFitHeight(height);
-        String text = element.getPosition().toString();
-        if (element instanceof Animal) {
-            imageView.setOpacity(((Animal) element).getEnergySaturation());
-            text=Double.toString(((Animal) element).getEnergySaturation());
-        }
-        vBox = new VBox(imageView,new Label(text));
+        vBox = new VBox(imageView);
         vBox.setPrefHeight(width);
         vBox.setPrefWidth(height);
         vBox.setAlignment(Pos.CENTER);
