@@ -10,7 +10,7 @@ public class WalledMap extends AbstractWorldMap {
     }
 
     @Override
-    public Vector2d positonAfterMove(Vector2d oldPosition, Vector2d moveVector) {
+    public Vector2d positionAfterMove(Vector2d oldPosition, Vector2d moveVector) {
         if (canMoveTo(oldPosition.add(moveVector))){
             return oldPosition.add(moveVector);
         }else{

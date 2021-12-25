@@ -19,10 +19,15 @@ public class SimulationEngine implements IEngine, Runnable {
         this.observers.remove(observer);
     }
 
-    public SimulationEngine(AbstractWorldMap map, Vector2d[] positions) {
-        for (Vector2d position : positions) {
-            Animal animal = new Animal(map, position);
-            map.place(animal);
+    public SimulationEngine(AbstractWorldMap map, int animalsAmount) {
+        Random rn = new Random();
+
+        for (int i=0; i<animalsAmount;i++){
+            Vector2d position = new Vector2d(rn.nextInt(AbstractWorldMap.getWidth()+1), rn.nextInt(AbstractWorldMap.getHeight()+1));
+            while (map.objectAt(position)!=null){
+                position = new Vector2d(rn.nextInt(AbstractWorldMap.getWidth()+1), rn.nextInt(AbstractWorldMap.getHeight()+1));
+            }
+            map.place(new Animal(map,position));
         }
         this.map = map;
     }

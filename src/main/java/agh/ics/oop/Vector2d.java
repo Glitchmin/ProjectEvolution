@@ -8,8 +8,8 @@ public class Vector2d {
         this.y = y;
     }
 
-    final int x;
-    final int y;
+    final public int x;
+    final public int y;
 
     public String toString() {
         return "(" + Integer.toString(this.x) + "," + Integer.toString(y) + ")";

@@ -4,7 +4,7 @@ import java.util.*;
 
 abstract public class AbstractWorldMap implements IPositionChangeObserver {
 
-    final MapObjectsHandler mapObjectsHandler = new MapObjectsHandler();
+    final private MapObjectsHandler mapObjectsHandler = new MapObjectsHandler();
     private static double jungleRatio;
     protected static int width;
     protected static int height;
@@ -87,7 +87,7 @@ abstract public class AbstractWorldMap implements IPositionChangeObserver {
         mapObjectsHandler.removeGrass(position);
     }
 
-    public abstract Vector2d positonAfterMove(Vector2d oldPosition, Vector2d moveVector);
+    public abstract Vector2d positionAfterMove(Vector2d oldPosition, Vector2d moveVector);
 
 
 

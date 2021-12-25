@@ -94,7 +94,7 @@ public class Animal implements IMapElement {
         this.direction = MapDirection.NORTH;
         this.map = map;
 
-        this.energy = new Random().nextInt(startEnergy/2)+startEnergy/2;
+        this.energy = startEnergy;
         this.genotype = new int[32];
         Random rn = new Random();
         for (int i=0; i<32;i++){
@@ -147,8 +147,8 @@ public class Animal implements IMapElement {
         ;
         out.println(this.direction);
 
-        positionChanged(this.position, map.positonAfterMove(position,moveVector), this);
-        this.position = map.positonAfterMove(position,moveVector);
+        positionChanged(this.position, map.positionAfterMove(position,moveVector), this);
+        this.position = map.positionAfterMove(position,moveVector);
 
     }
 
