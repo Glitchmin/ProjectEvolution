@@ -169,6 +169,14 @@ public class SimulationEngine implements IEngine, Runnable {
         return getAliveAnimalsCounter()==0;
     }
 
+    private void addStatistics(){
+        statisticsEngine.addData(LineCharts.aliveAnimalsCounter,map.getAliveAnimalsCounter());
+        statisticsEngine.addData(LineCharts.grassCounter,map.getGrassCounter());
+        statisticsEngine.addData(LineCharts.avgEnergy,statisticsEngine.getAvgEnergy());
+        statisticsEngine.addData(LineCharts.avgAnimalsLiveSpan, statisticsEngine.getAvgLiveSpan());
+        statisticsEngine.addData(LineCharts.avgAnimalsChildrenNumber,statisticsEngine.getAvgChildrenCount());
+    }
+
     public void run() {
         while (!isEveryoneDead()) {
             //out.println(map);
@@ -178,6 +186,7 @@ public class SimulationEngine implements IEngine, Runnable {
                 feedAllAnimals();
                 reproduceAllAnimals();
                 addGrassToMap();
+                addStatistics();
                 newDayHasCome();
 
                 try {

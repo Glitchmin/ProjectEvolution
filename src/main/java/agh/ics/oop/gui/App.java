@@ -4,7 +4,6 @@ import agh.ics.oop.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -72,15 +71,16 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         AbstractWorldMap map = new WrappingMap();
         engine = new SimulationEngine(map, Integer.parseInt(menuTextFields.get(5).getText()));
         simulationVisualizer = new SimulationVisualizer(map);
-        gridPaneOfEverything.add(simulationVisualizer.getSimulationGridPane(), 0, 0);
         Button buttonPause = new Button("Pause/Play");
-        gridPaneOfEverything.add(new HBox(buttonPause), 0, 1);
-        gridPaneOfEverything.add(engine.statisticsEngine.getAliveAnimalsCounterLineChart(),0,2);
-        gridPaneOfEverything.add(engine.statisticsEngine.getGrassCounterLineChart(),1,0);
-        gridPaneOfEverything.add(engine.statisticsEngine.getGenotypeLabel(),1,1);
-        gridPaneOfEverything.add(engine.statisticsEngine.getAvgEnergyLineChart(),1,2);
-        gridPaneOfEverything.add(engine.statisticsEngine.getAvgAnimalsLiveSPanLineChart(),2,0);
-        gridPaneOfEverything.add(engine.statisticsEngine.getAvgAnimalsChildrenNumberLineChart(),2,1);
+        VBox middleVBox = new VBox(engine.statisticsEngine.getLineChart(LineCharts.aliveAnimalsCounter), engine.statisticsEngine.getLineChart(LineCharts.grassCounter),
+                engine.statisticsEngine.getLineChart(LineCharts.avgEnergy), engine.statisticsEngine.getLineChart(LineCharts.avgAnimalsLiveSpan),
+                engine.statisticsEngine.getLineChart(LineCharts.avgAnimalsChildrenNumber));
+
+        middleVBox.setMaxWidth(200);
+
+        VBox leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(),engine.statisticsEngine.getGenotypeLabel(),buttonPause);
+        gridPaneOfEverything.add(leftSideVBox,0,0);
+        gridPaneOfEverything.add(middleVBox,1,0);
         addGripPaneConstraints();
         engine.addPositionObserver(this);
         engine.addDayObserver(this);

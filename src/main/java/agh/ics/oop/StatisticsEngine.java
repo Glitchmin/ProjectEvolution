@@ -1,6 +1,5 @@
 package agh.ics.oop;
 
-import javafx.application.Platform;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -9,58 +8,52 @@ import javafx.util.Pair;
 
 import java.util.*;
 
-import static java.lang.System.out;
-
 public class StatisticsEngine implements Runnable {
     private AbstractWorldMap map;
     private int daysCounter;
     private final Label genotypeLabel;
     private String genotypeLabelString;
 
+    private Vector<Vector<Integer>> chartList;
+    private final Vector< LineChart<Number, Number> > lineChart;
+    private final Vector< XYChart.Series<Number, Number> > lineChartDataSeries;
 
-    private final LineChart<Number, Number> aliveAnimalsCounterLineChart;
-    private final XYChart.Series<Number, Number> aliveAnimalsCounterLineChartDataSeries;
-
-    private final LineChart<Number, Number> grassCounterLineChart;
-    private final XYChart.Series<Number, Number> grassCounterLineChartDataSeries;
-
-    private final LineChart<Number, Number> avgEnergyLineChart;
-    private final XYChart.Series<Number, Number> avgEnergyLineChartDataSeries;
-
-    private final LineChart<Number, Number> avgAnimalsLiveSPanLineChart;
-    private final XYChart.Series<Number, Number> avgAnimalsLiveSPanLineChartDataSeries;
-
-    private final LineChart<Number, Number> avgAnimalsChildrenNumberLineChart;
-    private final XYChart.Series<Number, Number> avgAnimalsChildrenNumberLineChartDataSeries;
-
-    private final List<Integer> animalsLiveSpan;
+    private List<Integer> liveSpans;
 
 
     public StatisticsEngine(AbstractWorldMap map) {
         this.map = map;
-        animalsLiveSpan = new Vector<Integer>();
+        liveSpans = new Vector<Integer>();
         genotypeLabel = new Label("");
         genotypeLabelString = "";
         daysCounter = 0;
+        chartList = new Vector<>();
+        for (int i=0; i<5;i++){
+            chartList.add(new Vector<>());
+        }
+        lineChart = new Vector<>();
+        lineChartDataSeries = new Vector<>();
+
+
         Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> aliveAnimalsCounterLineChartPair = createLineChart("Number of days", "Number of animals", "Number of animals over time");
-        aliveAnimalsCounterLineChart = aliveAnimalsCounterLineChartPair.getKey();
-        aliveAnimalsCounterLineChartDataSeries = aliveAnimalsCounterLineChartPair.getValue();
+        lineChart.add(aliveAnimalsCounterLineChartPair.getKey());
+        lineChartDataSeries.add(aliveAnimalsCounterLineChartPair.getValue());
 
         Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> grassCounterLineChartPair = createLineChart("Number of days", "Number of grass fields", "Number of grass fields over time");
-        grassCounterLineChart = grassCounterLineChartPair.getKey();
-        grassCounterLineChartDataSeries = grassCounterLineChartPair.getValue();
+        lineChart.add(grassCounterLineChartPair.getKey());
+        lineChartDataSeries.add(grassCounterLineChartPair.getValue());
 
         Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgEnergyLineChartPair = createLineChart("Number of days", "Average energy", "Average animal energy over time");
-        avgEnergyLineChart = avgEnergyLineChartPair.getKey();
-        avgEnergyLineChartDataSeries = avgEnergyLineChartPair.getValue();
+        lineChart.add(avgEnergyLineChartPair.getKey());
+        lineChartDataSeries.add(avgEnergyLineChartPair.getValue());
 
         Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsLiveSPanLineChartPair = createLineChart("Number of days", "Average live span", "Average animal live span over time");
-        avgAnimalsLiveSPanLineChart = avgAnimalsLiveSPanLineChartPair.getKey();
-        avgAnimalsLiveSPanLineChartDataSeries = avgAnimalsLiveSPanLineChartPair.getValue();
+        lineChart.add(avgAnimalsLiveSPanLineChartPair.getKey());
+        lineChartDataSeries.add(avgAnimalsLiveSPanLineChartPair.getValue());
 
         Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsChildrenNumberLineChartPair = createLineChart("Number of days", "Average children amount", "Average animal children amount over time");
-        avgAnimalsChildrenNumberLineChart = avgAnimalsChildrenNumberLineChartPair.getKey();
-        avgAnimalsChildrenNumberLineChartDataSeries = avgAnimalsChildrenNumberLineChartPair.getValue();
+        lineChart.add(avgAnimalsChildrenNumberLineChartPair.getKey());
+        lineChartDataSeries.add(avgAnimalsChildrenNumberLineChartPair.getValue());
     }
 
     private Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> createLineChart(String xAxisLabel, String yAxisLabel, String chartTitle) {
@@ -79,12 +72,17 @@ public class StatisticsEngine implements Runnable {
 
 
     public void run() {
-        updateLineChartDataSeries(aliveAnimalsCounterLineChartDataSeries, map.getAliveAnimalsCounter());
-        updateLineChartDataSeries(grassCounterLineChartDataSeries, map.getGrassCounter());
-        updateLineChartDataSeries(avgEnergyLineChartDataSeries, getAvgEnergy());
-        updateLineChartDataSeries(avgAnimalsLiveSPanLineChartDataSeries, getAvgLiveSpan());
-        updateLineChartDataSeries(avgAnimalsChildrenNumberLineChartDataSeries, getAvgChildrenCount());
+        for (int i = 0; i < 5; i++) {
+            updateLineChartDataSeries(lineChartDataSeries.get(i), lastElement(chartList.get(i)));
+        }
         genotypeLabel.setText(genotypeLabelString);
+    }
+
+    public Integer lastElement(List<Integer> list) {
+        if (list.isEmpty()) {
+            return 0;
+        }
+        return list.get(list.size() - 1);
     }
 
     public void updateLineChartDataSeries(XYChart.Series<Number, Number> lineChartDataSeries, int newValue) {
@@ -100,31 +98,20 @@ public class StatisticsEngine implements Runnable {
         return daysCounter;
     }
 
-    public void addDeadAnimalLiveSpan(Integer liveSpan){
-        animalsLiveSpan.add(liveSpan);
+    public void addData(LineCharts lineCharts, Integer data) {
+        chartList.get(lineCharts.ordinal()).add(data);
     }
 
-    public LineChart<Number, Number> getAliveAnimalsCounterLineChart() {
-        return aliveAnimalsCounterLineChart;
+    public LineChart<Number, Number> getLineChart(LineCharts lineCharts) {
+        return lineChart.get(lineCharts.ordinal());
     }
 
-    public LineChart<Number, Number> getGrassCounterLineChart() {
-        return grassCounterLineChart;
+    public void addDeadAnimalLiveSpan(Integer liveSpan) {
+        liveSpans.add(liveSpan);
     }
 
-    public LineChart<Number, Number> getAvgEnergyLineChart() {
-        return avgEnergyLineChart;
-    }
 
-    public LineChart<Number, Number> getAvgAnimalsLiveSPanLineChart() {
-        return avgAnimalsLiveSPanLineChart;
-    }
-
-    public LineChart<Number, Number> getAvgAnimalsChildrenNumberLineChart() {
-        return avgAnimalsChildrenNumberLineChart;
-    }
-
-    private int getAvgEnergy() {
+    public int getAvgEnergy() {
         int energySum = 0;
         for (Animal animal : map.getAliveAnimals()) {
             energySum += animal.getEnergy();
@@ -132,24 +119,23 @@ public class StatisticsEngine implements Runnable {
         return energySum / map.getAliveAnimalsCounter();
     }
 
-    private int getAvgLiveSpan(){
-        if (animalsLiveSpan.isEmpty()){
+    public int getAvgLiveSpan() {
+        if (liveSpans.isEmpty()) {
             return 0;
         }
         int liveSpanSum = 0;
-        for (int liveSpan: animalsLiveSpan) {
+        for (int liveSpan : liveSpans) {
             liveSpanSum += liveSpan;
         }
-        return liveSpanSum/animalsLiveSpan.size();
+        return liveSpanSum / liveSpans.size();
     }
 
-    private int getAvgChildrenCount(){
-        int childrenCount=0;
-        for (Animal animal : map.getAliveAnimals()){
+    public int getAvgChildrenCount() {
+        int childrenCount = 0;
+        for (Animal animal : map.getAliveAnimals()) {
             childrenCount += animal.getChildrenCounter();
         }
-        return childrenCount/map.getAliveAnimalsCounter();
-
+        return childrenCount / map.getAliveAnimalsCounter();
     }
 
     public void updateMostPopularGenotype() {
@@ -168,7 +154,7 @@ public class StatisticsEngine implements Runnable {
                 maxi = genotypesCounterMap.get(genotype);
             }
         }
-        genotypeLabelString = "dominant genotype: " + dominant;
+        genotypeLabelString = dominant;
     }
 
     public Label getGenotypeLabel() {
