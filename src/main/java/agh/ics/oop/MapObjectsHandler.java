@@ -103,4 +103,10 @@ public class MapObjectsHandler implements IPositionChangeObserver {
     public List<Vector2d> getGrassPositionsList() {
         return grassPositionsList;
     }
+
+    public void removeTrackingFromAnimals(){
+        for (Animal animal:getAliveAnimals()){
+            animal.setIsTracked(false);
+        }
+    }
 }

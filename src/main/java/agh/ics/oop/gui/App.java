@@ -24,6 +24,7 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
     private SimulationEngine engine;
     private List<TextField> menuTextFields;
     private SimulationVisualizer simulationVisualizer;
+    private AnimalTracker animalTracker;
 
 
     private Label addCenteredLabel(GridPane gridPane, String text, int x, int y) {
@@ -56,6 +57,7 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
 
             buttonPause.setOnAction(actionEvent1 -> {
                 engine.pausePlayButtonPressed();
+                simulationVisualizer.simulationPaused(engine.isPaused());
             });
         });
     }
@@ -66,21 +68,21 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
     }
 
     private Button startASimulation() {
+        animalTracker = new AnimalTracker();
         getParamsFromMenuTextFields();
         gridPaneOfEverything.getChildren().clear();
         AbstractWorldMap map = new WrappingMap();
-        engine = new SimulationEngine(map, Integer.parseInt(menuTextFields.get(5).getText()));
-        simulationVisualizer = new SimulationVisualizer(map);
+        engine = new SimulationEngine(map, Integer.parseInt(menuTextFields.get(5).getText()), animalTracker);
+        simulationVisualizer = new SimulationVisualizer(map, animalTracker);
         Button buttonPause = new Button("Pause/Play");
-        VBox middleVBox = new VBox(engine.statisticsEngine.getLineChart(LineCharts.aliveAnimalsCounter), engine.statisticsEngine.getLineChart(LineCharts.grassCounter),
+        VBox middleLeftVBox = new VBox(engine.statisticsEngine.getLineChart(LineCharts.aliveAnimalsCounter), engine.statisticsEngine.getLineChart(LineCharts.grassCounter),
                 engine.statisticsEngine.getLineChart(LineCharts.avgEnergy), engine.statisticsEngine.getLineChart(LineCharts.avgAnimalsLiveSpan),
                 engine.statisticsEngine.getLineChart(LineCharts.avgAnimalsChildrenNumber));
-
-        middleVBox.setMaxWidth(200);
-
-        VBox leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(),engine.statisticsEngine.getGenotypeLabel(),buttonPause);
+        middleLeftVBox.setMaxWidth(200);
+        VBox leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(),buttonPause,new Label("Dominant Genotype:"),engine.statisticsEngine.getGenotypeLabel(),
+        new Label("Tracker:"),simulationVisualizer.getObservedAnimalVBox());
         gridPaneOfEverything.add(leftSideVBox,0,0);
-        gridPaneOfEverything.add(middleVBox,1,0);
+        gridPaneOfEverything.add(middleLeftVBox,1,0);
         addGripPaneConstraints();
         engine.addPositionObserver(this);
         engine.addDayObserver(this);

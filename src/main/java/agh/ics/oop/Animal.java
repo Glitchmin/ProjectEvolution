@@ -16,6 +16,8 @@ public class Animal implements IMapElement {
     private final int dayOfBirth;
     private int childrenCounter;
     final private int [] genotype;
+    private boolean isOffspringOfTrackedAnimal;
+    private boolean isTracked;
 
     static private int startEnergy;
     static private int moveEnergy;
@@ -64,6 +66,7 @@ public class Animal implements IMapElement {
         this.childrenCounter=0;
         parent1.childrenCounter++;
         parent2.childrenCounter++;
+        this.isOffspringOfTrackedAnimal = parent1.isOffspringOfTrackedAnimal || parent2.isOffspringOfTrackedAnimal || parent1.isTracked || parent2.isTracked;
         this.position = new Vector2d(parent1.getPosition().getX(), parent1.getPosition().getY());
         Random rn = new Random();
         this.direction = MapDirection.values()[rn.nextInt(8)];
@@ -172,6 +175,17 @@ public class Animal implements IMapElement {
 
     public int getChildrenCounter() {
         return childrenCounter;
+    }
+
+    public void setIsTracked(boolean isTracked){
+        this.isTracked = isTracked;
+        if (!isTracked){
+            this.isOffspringOfTrackedAnimal=false;
+        }
+    }
+
+    public boolean isOffspringOfTrackedAnimal() {
+        return isOffspringOfTrackedAnimal;
     }
 
     public int getDayOfBirth() {

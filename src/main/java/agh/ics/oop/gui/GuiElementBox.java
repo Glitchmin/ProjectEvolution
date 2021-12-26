@@ -29,6 +29,14 @@ public class GuiElementBox {
         GuiElementBox.height = height;
     }
 
+    public static int getWidth() {
+        return width;
+    }
+
+    public static int getHeight() {
+        return height;
+    }
+
     public GuiElementBox(IMapElement element) throws FileNotFoundException {
         Image image;
         if (imagesMap.get(element.getResourcePath())!=null){

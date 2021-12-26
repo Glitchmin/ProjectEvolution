@@ -14,6 +14,7 @@ public class StatisticsEngine implements Runnable {
     private final Label genotypeLabel;
     private String genotypeLabelString;
 
+
     private Vector<Vector<Integer>> chartList;
     private final Vector< LineChart<Number, Number> > lineChart;
     private final Vector< XYChart.Series<Number, Number> > lineChartDataSeries;

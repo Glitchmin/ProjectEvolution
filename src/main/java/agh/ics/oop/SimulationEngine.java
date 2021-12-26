@@ -9,9 +9,10 @@ import static java.lang.System.out;
 
 public class SimulationEngine implements IEngine, Runnable {
     AbstractWorldMap map;
-    Integer moveDelayMs = 5;
-    boolean isPaused = false;
+    Integer moveDelayMs = 50;
+    private boolean isPaused = false;
     public StatisticsEngine statisticsEngine;
+    private AnimalTracker animalTracker;
 
     @Override
     public void addDayObserver(IDayChangeObserver observer) {
@@ -33,7 +34,8 @@ public class SimulationEngine implements IEngine, Runnable {
         positionObservers.remove(observer);
     }
 
-    public SimulationEngine(AbstractWorldMap map, int animalsAmount) {
+    public SimulationEngine(AbstractWorldMap map, int animalsAmount, AnimalTracker animalTracker) {
+        this.animalTracker = animalTracker;
         Random rn = new Random();
         statisticsEngine = new StatisticsEngine(map);
         for (int i=0; i<animalsAmount;i++){
@@ -62,6 +64,9 @@ public class SimulationEngine implements IEngine, Runnable {
         List<Animal> animalListCopy = new Vector<>(map.getAliveAnimals());
         for (Animal animal : animalListCopy) {
             if (animal.isOutOfEnergy()) {
+                if (animal == animalTracker.getAnimal()){
+                    animalTracker.justDied(statisticsEngine.getDaysCounter());
+                }
                 statisticsEngine.addDeadAnimalLiveSpan(statisticsEngine.getDaysCounter()-animal.getDayOfBirth());
                 map.removeAnimal(animal);
                 map.getAliveAnimals().remove(animal);
@@ -156,13 +161,22 @@ public class SimulationEngine implements IEngine, Runnable {
         for (Vector2d position:map.getObjectPositions().keySet()){
             Pair<Animal, Animal> animalsInLoveUwU = get2StrongestAnimalsAtPos(map.getObjectPositions(),position);
             if (animalsInLoveUwU.getValue() != null && animalsInLoveUwU.getValue().getEnergy() > Animal.getStartEnergy()/2){
-                map.place(new Animal(animalsInLoveUwU.getKey(), animalsInLoveUwU.getValue(),statisticsEngine.getDaysCounter()));
+                Animal animal = new Animal(animalsInLoveUwU.getKey(), animalsInLoveUwU.getValue(),statisticsEngine.getDaysCounter());
+                map.place(animal);
+                if (animal.isOffspringOfTrackedAnimal()){
+                    animalTracker.addToOffspringCounter();
+                }
+
             }
         }
     }
 
     public void pausePlayButtonPressed(){
         isPaused=!isPaused;
+    }
+
+    public boolean isPaused(){
+        return isPaused;
     }
 
     private boolean isEveryoneDead(){

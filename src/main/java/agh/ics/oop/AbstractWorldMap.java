@@ -4,7 +4,7 @@ import java.util.*;
 
 abstract public class AbstractWorldMap implements IPositionChangeObserver {
 
-    final private MapObjectsHandler mapObjectsHandler = new MapObjectsHandler();
+    final public MapObjectsHandler mapObjectsHandler = new MapObjectsHandler();
     private static double jungleRatio;
     protected static int width;
     protected static int height;
