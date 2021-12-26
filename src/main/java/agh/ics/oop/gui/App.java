@@ -4,6 +4,7 @@ import agh.ics.oop.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,7 +12,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import javax.print.attribute.standard.MediaSize;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,16 +61,27 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         });
     }
 
+    private void addGripPaneConstraints() {
+        gridPaneOfEverything.setMaxHeight(800);
+        gridPaneOfEverything.setMaxWidth(1400);
+    }
+
     private Button startASimulation() {
         getParamsFromMenuTextFields();
         gridPaneOfEverything.getChildren().clear();
         AbstractWorldMap map = new WrappingMap();
         engine = new SimulationEngine(map, Integer.parseInt(menuTextFields.get(5).getText()));
         simulationVisualizer = new SimulationVisualizer(map);
-        gridPaneOfEverything.add(simulationVisualizer.getSimulationGridPane(), 0, 0, 1, 1);
+        gridPaneOfEverything.add(simulationVisualizer.getSimulationGridPane(), 0, 0);
         Button buttonPause = new Button("Pause/Play");
-        gridPaneOfEverything.add(new HBox(buttonPause), 0, 1, 1, 1);
-        gridPaneOfEverything.add(engine.getAvgAliveAnimalsCounterLineChart(),0,2);
+        gridPaneOfEverything.add(new HBox(buttonPause), 0, 1);
+        gridPaneOfEverything.add(engine.statisticsEngine.getAliveAnimalsCounterLineChart(),0,2);
+        gridPaneOfEverything.add(engine.statisticsEngine.getGrassCounterLineChart(),1,0);
+        gridPaneOfEverything.add(engine.statisticsEngine.getGenotypeLabel(),1,1);
+        gridPaneOfEverything.add(engine.statisticsEngine.getAvgEnergyLineChart(),1,2);
+        gridPaneOfEverything.add(engine.statisticsEngine.getAvgAnimalsLiveSPanLineChart(),2,0);
+        gridPaneOfEverything.add(engine.statisticsEngine.getAvgAnimalsChildrenNumberLineChart(),2,1);
+        addGripPaneConstraints();
         engine.addPositionObserver(this);
         engine.addDayObserver(this);
         Thread engineThread = new Thread(engine);
@@ -95,7 +106,7 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
     private void addParamFieldsToMenu() {
         String[] intParamNames = {"Width", "Height", "Start Energy", "Move Energy", "Plant Energy", "Amount of Animals"};
         menuTextFields = new ArrayList<>();
-        Integer[] intParamsDefaults = {30, 30, 100, 1, 10, 10};
+        Integer[] intParamsDefaults = {30, 30, 100, 1, 100, 10};
         for (int i = 0; i < 6; i++) {
             TextField intParamTextField = new TextField(intParamsDefaults[i].toString());
             gridPaneOfEverything.add(new HBox(new Label(intParamNames[i]), intParamTextField), 0, i, 1, 1);
@@ -110,7 +121,7 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
 
     public void start(Stage primaryStage) {
         gridPaneOfEverything = new GridPane();
-        Scene scene = new Scene(gridPaneOfEverything, 1400, 800);
+        Scene scene = new Scene(gridPaneOfEverything, 1400, 850);
         primaryStage.setScene(scene);
         this.primaryStage = primaryStage;
         Platform.runLater(primaryStage::show);
@@ -124,10 +135,8 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
     }
 
     private void updateView() {
-        out.println("new day has come hmm");
         Platform.runLater(primaryStage::show);
         Platform.runLater(simulationVisualizer);
-        out.println(engine.getAliveAnimalsCounter());
 
     }
 

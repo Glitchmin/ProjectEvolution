@@ -13,6 +13,8 @@ public class Animal implements IMapElement {
     private final AbstractWorldMap map;
     final List<IPositionChangeObserver> observers = new ArrayList<>();
     private int energy;
+    private final int dayOfBirth;
+    private int childrenCounter;
     final private int [] genotype;
 
     static private int startEnergy;
@@ -57,7 +59,11 @@ public class Animal implements IMapElement {
         energy-=moveEnergy;
     }
 
-    public Animal(Animal parent1, Animal parent2){
+    public Animal(Animal parent1, Animal parent2, int dayOfBirth){
+        this.dayOfBirth = dayOfBirth;
+        this.childrenCounter=0;
+        parent1.childrenCounter++;
+        parent2.childrenCounter++;
         this.position = new Vector2d(parent1.getPosition().getX(), parent1.getPosition().getY());
         Random rn = new Random();
         this.direction = MapDirection.values()[rn.nextInt(8)];
@@ -75,6 +81,7 @@ public class Animal implements IMapElement {
             System.arraycopy(parent2.genotype, 0, this.genotype, 0, 32-howManyGenesDoesP1Give);
             System.arraycopy(parent1.genotype, 32-howManyGenesDoesP1Give, this.genotype, 32-howManyGenesDoesP1Give, howManyGenesDoesP1Give);
         }
+        Arrays.sort(this.genotype);
         /*out.print(parent1.energy);
         out.print(" ");
         out.print(parent2.energy);
@@ -84,16 +91,16 @@ public class Animal implements IMapElement {
         out.println(Arrays.toString(parent1.genotype));
         out.println(Arrays.toString(parent2.genotype));
         out.println(Arrays.toString(this.genotype));
-        Arrays.sort(this.genotype);
         out.print("zwierzak powstal na skutek SEXU haha");
         out.println(Arrays.toString(this.genotype));*/
     }
 
-    public Animal(AbstractWorldMap map, Vector2d initialPos) {
+    public Animal(AbstractWorldMap map, Vector2d initialPos, int dayOfBirth) {
+        this.dayOfBirth = dayOfBirth;
         this.position = initialPos;
         this.direction = MapDirection.NORTH;
         this.map = map;
-
+        this.childrenCounter=0;
         this.energy = startEnergy;
         this.genotype = new int[32];
         Random rn = new Random();
@@ -125,6 +132,9 @@ public class Animal implements IMapElement {
         return new Vector2d(this.position.getX(), this.position.getY());
     }
 
+    public int[] getGenotype() {
+        return genotype;
+    }
 
     public boolean isAt(Vector2d position) {
         return (this.position.equals(position));
@@ -158,5 +168,13 @@ public class Animal implements IMapElement {
         for (IPositionChangeObserver observer : observers) {
             observer.positionChanged(oldPosition, newPosition, this);
         }
+    }
+
+    public int getChildrenCounter() {
+        return childrenCounter;
+    }
+
+    public int getDayOfBirth() {
+        return dayOfBirth;
     }
 }

@@ -1,6 +1,7 @@
 package agh.ics.oop.gui;
 
 import agh.ics.oop.AbstractWorldMap;
+import agh.ics.oop.Animal;
 import agh.ics.oop.IMapElement;
 import agh.ics.oop.Vector2d;
 import javafx.scene.layout.ColumnConstraints;
@@ -8,9 +9,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 
-import java.util.List;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.util.*;
 
 import static java.lang.System.out;
 
@@ -21,12 +20,15 @@ public class SimulationVisualizer implements Runnable {
     private final Vector2d mapUpperRight;
 
     private void addGripPaneConstraints() {
+        int rowSize=(500 / (mapUpperRight.y));
+        int columnSize=(500 / (mapUpperRight.x));
+        int finalSize = Math.min(columnSize, rowSize);
         for (int y = 0; y < mapUpperRight.y; y++) {
-            simulationGridPane.getRowConstraints().add(new RowConstraints((Integer) (500 / (mapUpperRight.x))));
+            simulationGridPane.getRowConstraints().add(new RowConstraints(rowSize));
         }
 
         for (int x = 0; x < mapUpperRight.x; x++) {
-            simulationGridPane.getColumnConstraints().add(new ColumnConstraints((Integer) (500 / (mapUpperRight.y))));
+            simulationGridPane.getColumnConstraints().add(new ColumnConstraints(columnSize));
         }
     }
 
@@ -42,6 +44,8 @@ public class SimulationVisualizer implements Runnable {
         GuiElementBox.setWidth(500 / AbstractWorldMap.getWidth());
         simulationGridPane = new GridPane();
         simulationGridPane.setGridLinesVisible(true);
+        simulationGridPane.setMaxHeight(500);
+        simulationGridPane.setMaxWidth(500);
         this.map = map;
         mapUpperRight = new Vector2d(AbstractWorldMap.getWidth(), AbstractWorldMap.getHeight());
         List<IMapElement> mapCopy = map.getCopyOfMapElements();
@@ -93,4 +97,5 @@ public class SimulationVisualizer implements Runnable {
         updateGridPaneNode(oldPosition);
         updateGridPaneNode(newPosition);
     }
+
 }

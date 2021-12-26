@@ -1,7 +1,6 @@
 package agh.ics.oop;
 
 import javafx.application.Platform;
-import javafx.scene.chart.LineChart;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -10,7 +9,7 @@ import static java.lang.System.out;
 
 public class SimulationEngine implements IEngine, Runnable {
     AbstractWorldMap map;
-    Integer moveDelayMs = 50;
+    Integer moveDelayMs = 5;
     boolean isPaused = false;
     public StatisticsEngine statisticsEngine;
 
@@ -42,7 +41,7 @@ public class SimulationEngine implements IEngine, Runnable {
             while (map.objectsAt(position)!=null){
                 position = new Vector2d(rn.nextInt(AbstractWorldMap.getWidth()), rn.nextInt(AbstractWorldMap.getHeight()));
             }
-            map.place(new Animal(map,position));
+            map.place(new Animal(map,position,0));
         }
         this.map = map;
     }
@@ -63,7 +62,7 @@ public class SimulationEngine implements IEngine, Runnable {
         List<Animal> animalListCopy = new Vector<>(map.getAliveAnimals());
         for (Animal animal : animalListCopy) {
             if (animal.isOutOfEnergy()) {
-                out.println("zwierzak out of energy"+animal.getEnergy());
+                statisticsEngine.addDeadAnimalLiveSpan(statisticsEngine.getDaysCounter()-animal.getDayOfBirth());
                 map.removeAnimal(animal);
                 map.getAliveAnimals().remove(animal);
             }
@@ -71,9 +70,6 @@ public class SimulationEngine implements IEngine, Runnable {
         Platform.runLater(statisticsEngine);
     }
 
-    public LineChart<Number, Number> getAvgAliveAnimalsCounterLineChart() {
-        return statisticsEngine.getAvgAliveAnimalsCounterLineChart();
-    }
 
     private void moveAllAnimals() {
         for (Animal animal : map.getAliveAnimals()) {
@@ -90,6 +86,7 @@ public class SimulationEngine implements IEngine, Runnable {
         for (Vector2d position : keySetCopy) {
             calculateEatingForPos(objectPositions, position);
         }
+        statisticsEngine.updateMostPopularGenotype();
     }
 
     private void calculateEatingForPos(SortedMap<Vector2d, List<IMapElement>> objectPositions, Vector2d position) {
@@ -130,7 +127,7 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     public int getAliveAnimalsCounter(){
-        return statisticsEngine.getAliveAnimalsCounter();
+        return map.getAliveAnimalsCounter();
     }
 
     private void addGrassToMap(){
@@ -159,7 +156,7 @@ public class SimulationEngine implements IEngine, Runnable {
         for (Vector2d position:map.getObjectPositions().keySet()){
             Pair<Animal, Animal> animalsInLoveUwU = get2StrongestAnimalsAtPos(map.getObjectPositions(),position);
             if (animalsInLoveUwU.getValue() != null && animalsInLoveUwU.getValue().getEnergy() > Animal.getStartEnergy()/2){
-                map.place(new Animal(animalsInLoveUwU.getKey(), animalsInLoveUwU.getValue()));
+                map.place(new Animal(animalsInLoveUwU.getKey(), animalsInLoveUwU.getValue(),statisticsEngine.getDaysCounter()));
             }
         }
     }

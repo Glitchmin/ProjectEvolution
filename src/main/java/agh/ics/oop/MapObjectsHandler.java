@@ -100,4 +100,7 @@ public class MapObjectsHandler implements IPositionChangeObserver {
         return mapElementsList;
     }
 
+    public List<Vector2d> getGrassPositionsList() {
+        return grassPositionsList;
+    }
 }
