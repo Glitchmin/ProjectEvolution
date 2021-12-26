@@ -21,10 +21,13 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
 
     private GridPane gridPaneOfEverything;
     private Stage primaryStage;
-    private SimulationEngine engine;
+    private SimulationEngine leftMapEngine;
+    private SimulationEngine rightMapEngine;
     private List<TextField> menuTextFields;
-    private SimulationVisualizer simulationVisualizer;
-    private AnimalTracker animalTracker;
+    private SimulationVisualizer leftMapSimulationVisualizer;
+    private SimulationVisualizer rightMapSimulationVisualizer;
+    private Button leftMapPauseButton;
+    private Button rightMapPauseButton;
 
 
     private Label addCenteredLabel(GridPane gridPane, String text, int x, int y) {
@@ -53,11 +56,18 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         Platform.runLater(primaryStage::show);
 
         buttonStart.setOnAction(actionEvent -> {
-            Button buttonPause = startASimulation();
+            startASimulation();
 
-            buttonPause.setOnAction(actionEvent1 -> {
-                engine.pausePlayButtonPressed();
-                simulationVisualizer.simulationPaused(engine.isPaused());
+            leftMapPauseButton.setOnAction(actionEvent1 -> {
+                out.println("lewy nac");
+                leftMapEngine.pausePlayButtonPressed();
+                leftMapSimulationVisualizer.simulationPaused(leftMapEngine.isPaused());
+            });
+
+            rightMapPauseButton.setOnAction(actionEvent1 -> {
+                out.println("prawy nac");
+                rightMapEngine.pausePlayButtonPressed();
+                rightMapSimulationVisualizer.simulationPaused(rightMapEngine.isPaused());
             });
         });
     }
@@ -67,28 +77,51 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         gridPaneOfEverything.setMaxWidth(1400);
     }
 
-    private Button startASimulation() {
-        animalTracker = new AnimalTracker();
-        getParamsFromMenuTextFields();
-        gridPaneOfEverything.getChildren().clear();
-        AbstractWorldMap map = new WrappingMap();
-        engine = new SimulationEngine(map, Integer.parseInt(menuTextFields.get(5).getText()), animalTracker);
-        simulationVisualizer = new SimulationVisualizer(map, animalTracker);
-        Button buttonPause = new Button("Pause/Play");
-        VBox middleLeftVBox = new VBox(engine.statisticsEngine.getLineChart(LineCharts.aliveAnimalsCounter), engine.statisticsEngine.getLineChart(LineCharts.grassCounter),
-                engine.statisticsEngine.getLineChart(LineCharts.avgEnergy), engine.statisticsEngine.getLineChart(LineCharts.avgAnimalsLiveSpan),
-                engine.statisticsEngine.getLineChart(LineCharts.avgAnimalsChildrenNumber));
-        middleLeftVBox.setMaxWidth(200);
-        VBox leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(),buttonPause,new Label("Dominant Genotype:"),engine.statisticsEngine.getGenotypeLabel(),
-        new Label("Tracker:"),simulationVisualizer.getObservedAnimalVBox());
-        gridPaneOfEverything.add(leftSideVBox,0,0);
-        gridPaneOfEverything.add(middleLeftVBox,1,0);
+    private void startASimulationEngine(AbstractWorldMap map, SimulationEngine engine,  SimulationVisualizer simulationVisualizer, Button pauseButton, int columnIndex, boolean isLeft){
+        VBox middleVBox = new VBox(StatisticsEngine.getLineChart(LineCharts.aliveAnimalsCounter), StatisticsEngine.getLineChart(LineCharts.grassCounter),
+                StatisticsEngine.getLineChart(LineCharts.avgEnergy), StatisticsEngine.getLineChart(LineCharts.avgAnimalsLiveSpan),
+                StatisticsEngine.getLineChart(LineCharts.avgAnimalsChildrenNumber));
+        middleVBox.setMaxWidth(200);
+        VBox leftSideVBox;
+        if (isLeft) {
+            leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), pauseButton, new Label("Dominant Genotype:"),
+                    engine.statisticsEngine.getGenotypeLabel(),
+                    new Label("Tracker:"), simulationVisualizer.getObservedAnimalVBox());
+        }else {
+            leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), pauseButton);
+        }
+        gridPaneOfEverything.add(leftSideVBox,columnIndex,0);
+
+        gridPaneOfEverything.add(middleVBox, 1, 0);
         addGripPaneConstraints();
         engine.addPositionObserver(this);
         engine.addDayObserver(this);
-        Thread engineThread = new Thread(engine);
-        engineThread.start();
-        return buttonPause;
+
+    }
+
+    private void startASimulation() {
+        AnimalTracker animalTracker = new AnimalTracker();
+        getParamsFromMenuTextFields();
+        gridPaneOfEverything.getChildren().clear();
+        AbstractWorldMap leftMap = new WrappingMap();
+        AbstractWorldMap rightMap = new WalledMap();
+        leftMapSimulationVisualizer = new SimulationVisualizer(leftMap, animalTracker);
+        rightMapSimulationVisualizer = new SimulationVisualizer(rightMap, animalTracker);
+        leftMapPauseButton = new Button("Pause/Play");
+        rightMapPauseButton = new Button("Pause/Play");
+
+        leftMapEngine = new SimulationEngine(leftMap, Integer.parseInt(menuTextFields.get(5).getText()), animalTracker);
+        rightMapEngine = new SimulationEngine(rightMap, Integer.parseInt(menuTextFields.get(5).getText()), animalTracker);
+
+
+        startASimulationEngine(leftMap, leftMapEngine, leftMapSimulationVisualizer, leftMapPauseButton,0, true);
+        startASimulationEngine(rightMap, rightMapEngine, rightMapSimulationVisualizer, rightMapPauseButton,2, false);
+
+        Thread leftEngineThread = new Thread(leftMapEngine);
+        leftEngineThread.start();
+
+        Thread rightEngineThread = new Thread(rightMapEngine);
+        rightEngineThread.start();
     }
 
 
@@ -133,12 +166,22 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
     @Override
     public void newDayHasCome() {
         Platform.runLater(this::updateView);
-        Platform.runLater(engine.statisticsEngine::newDayHasCome);
+        if (!leftMapEngine.isPaused()) {
+            Platform.runLater(leftMapEngine.statisticsEngine::newDayHasCome);
+        }
+        if (!rightMapEngine.isPaused()) {
+            Platform.runLater(rightMapEngine.statisticsEngine::newDayHasCome);
+        }
     }
 
     private void updateView() {
         Platform.runLater(primaryStage::show);
-        Platform.runLater(simulationVisualizer);
+        if (!leftMapEngine.isPaused()) {
+            Platform.runLater(leftMapSimulationVisualizer);
+        }
+        if (!rightMapEngine.isPaused()) {
+            Platform.runLater(rightMapSimulationVisualizer);
+        }
 
     }
 

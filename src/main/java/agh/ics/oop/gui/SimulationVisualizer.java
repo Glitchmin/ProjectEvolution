@@ -1,6 +1,7 @@
 package agh.ics.oop.gui;
 
 import agh.ics.oop.*;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
@@ -18,7 +19,6 @@ public class SimulationVisualizer implements Runnable {
     private final AbstractWorldMap map;
     private final GridPane simulationGridPane;
     private final TreeMap<Vector2d, List<VBox>> vBoxListMap;
-    private final TreeMap<Vector2d, Button> buttonMap;
     private final Vector2d mapUpperRight;
     private final VBox observedAnimalVBox;
     private final Label observedAnimalPositionLabel;
@@ -44,6 +44,7 @@ public class SimulationVisualizer implements Runnable {
     private void addToGuiElementsListMap(Vector2d position, GuiElementBox guiElementBox) {
         vBoxListMap.computeIfAbsent(position, k -> new Vector<>());
         simulationGridPane.add(guiElementBox.getVBox(), position.x, position.y, 1, 1);
+        guiElementBox.getVBox().setOnMouseClicked(Action -> checkGridPane(guiElementBox.getVBox()));
         vBoxListMap.get(position).add(guiElementBox.getVBox());
     }
 
@@ -65,7 +66,6 @@ public class SimulationVisualizer implements Runnable {
         this.map = map;
         mapUpperRight = new Vector2d(AbstractWorldMap.getWidth(), AbstractWorldMap.getHeight());
         List<IMapElement> mapCopy = map.getCopyOfMapElements();
-        buttonMap = new TreeMap<>(Vector2d.xFirstComparator);
         addGripPaneConstraints();
 
         for (IMapElement mapElement : mapCopy) {
@@ -80,15 +80,17 @@ public class SimulationVisualizer implements Runnable {
 
 
 
-    private void checkButtons(Button button){
-        out.println(button.getHeight() +" "+ GuiElementBox.getHeight());
-        button.setMaxHeight(GuiElementBox.getHeight());
-        for (Vector2d position: buttonMap.keySet()){
-            if (button == buttonMap.get(position)){
-                if (map.objectsAt(position)!=null && map.objectsAt(position).get(0) instanceof Animal) {
-                    map.mapObjectsHandler.removeTrackingFromAnimals();
-                    animalTracker.addAnimal((Animal) map.objectsAt(position).get(0));
-                    updateObservedAnimalVBox();
+    private void checkGridPane(VBox vBox){
+        for (Vector2d position : vBoxListMap.keySet()){
+            for (VBox vBoxFromList: vBoxListMap.get(position)){
+                if (vBox == vBoxFromList){
+                    if (map.objectsAt(position)!=null) {
+                        for (Animal animal: map.getAliveAnimals()){
+                            animal.setIsTracked(false);
+                        }
+                        animalTracker.addAnimal((Animal) map.objectsAt(position).get(0));
+                        updateObservedAnimalVBox();
+                    }
                 }
             }
         }
@@ -96,31 +98,7 @@ public class SimulationVisualizer implements Runnable {
 
     public void simulationPaused(boolean isPaused){
         if (isPaused) {
-            for (int i = 0; i < AbstractWorldMap.getWidth(); i++) {
-                for (int j = 0; j < AbstractWorldMap.getHeight(); j++) {
-                    Button button = new Button();
-                    buttonMap.put(new Vector2d(i, j), button);
-                    button.setMaxWidth(GuiElementBox.getWidth());
-                    button.setMaxHeight(GuiElementBox.getHeight());
-                    simulationGridPane.add(button,i,j);
-                    button.setOnAction(action-> checkButtons(button));
-                }
-            }
-            for (IMapElement mapElement: map.getCopyOfMapElements()){
-                try {
-                    GuiElementBox guiElementBox = new GuiElementBox(mapElement);
-                    buttonMap.get(mapElement.getPosition()).setGraphic(guiElementBox.getVBox());
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        }else{
-            out.println(simulationGridPane.getChildren().size());
-            for (Vector2d position: buttonMap.keySet()) {
-                simulationGridPane.getChildren().remove(buttonMap.get(position));
-            }
-            out.println(simulationGridPane.getChildren().size());
-            buttonMap.clear();
+
         }
     }
 
@@ -129,7 +107,7 @@ public class SimulationVisualizer implements Runnable {
     }
 
     private void updateObservedAnimalVBox(){
-        observedAnimalPositionLabel.setText("position:" + animalTracker.getPosition());
+        observedAnimalPositionLabel.setText(animalTracker.getPosition());
         observedAnimalDeathLabel.setText(animalTracker.getDeathDay());
         observedAnimalOffspringLabel.setText(animalTracker.getOffspringCounter());
         observedAnimalChildrenLabel.setText(animalTracker.getChildrenCounter());

@@ -2,6 +2,8 @@ package agh.ics.oop;
 
 import java.util.*;
 
+import static java.lang.System.out;
+
 public class MapObjectsHandler implements IPositionChangeObserver {
 
 

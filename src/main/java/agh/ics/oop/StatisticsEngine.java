@@ -8,6 +8,8 @@ import javafx.util.Pair;
 
 import java.util.*;
 
+import static java.lang.System.out;
+
 public class StatisticsEngine implements Runnable {
     private AbstractWorldMap map;
     private int daysCounter;
@@ -16,7 +18,7 @@ public class StatisticsEngine implements Runnable {
 
 
     private Vector<Vector<Integer>> chartList;
-    private final Vector< LineChart<Number, Number> > lineChart;
+    private static final Vector< LineChart<Number, Number> > lineChart = new Vector<>();
     private final Vector< XYChart.Series<Number, Number> > lineChartDataSeries;
 
     private List<Integer> liveSpans;
@@ -32,29 +34,38 @@ public class StatisticsEngine implements Runnable {
         for (int i=0; i<5;i++){
             chartList.add(new Vector<>());
         }
-        lineChart = new Vector<>();
         lineChartDataSeries = new Vector<>();
 
 
         Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> aliveAnimalsCounterLineChartPair = createLineChart("Number of days", "Number of animals", "Number of animals over time");
-        lineChart.add(aliveAnimalsCounterLineChartPair.getKey());
         lineChartDataSeries.add(aliveAnimalsCounterLineChartPair.getValue());
 
         Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> grassCounterLineChartPair = createLineChart("Number of days", "Number of grass fields", "Number of grass fields over time");
-        lineChart.add(grassCounterLineChartPair.getKey());
         lineChartDataSeries.add(grassCounterLineChartPair.getValue());
 
         Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgEnergyLineChartPair = createLineChart("Number of days", "Average energy", "Average animal energy over time");
-        lineChart.add(avgEnergyLineChartPair.getKey());
         lineChartDataSeries.add(avgEnergyLineChartPair.getValue());
 
         Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsLiveSPanLineChartPair = createLineChart("Number of days", "Average live span", "Average animal live span over time");
-        lineChart.add(avgAnimalsLiveSPanLineChartPair.getKey());
         lineChartDataSeries.add(avgAnimalsLiveSPanLineChartPair.getValue());
 
         Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsChildrenNumberLineChartPair = createLineChart("Number of days", "Average children amount", "Average animal children amount over time");
-        lineChart.add(avgAnimalsChildrenNumberLineChartPair.getKey());
         lineChartDataSeries.add(avgAnimalsChildrenNumberLineChartPair.getValue());
+
+        if (lineChart.isEmpty()){
+            lineChart.add(aliveAnimalsCounterLineChartPair.getKey());
+            lineChart.add(grassCounterLineChartPair.getKey());
+            lineChart.add(avgEnergyLineChartPair.getKey());
+            lineChart.add(avgAnimalsLiveSPanLineChartPair.getKey());
+            lineChart.add(avgAnimalsChildrenNumberLineChartPair.getKey());
+        }else{
+            lineChart.get(0).getData().add(aliveAnimalsCounterLineChartPair.getValue());
+            lineChart.get(1).getData().add(grassCounterLineChartPair.getValue());
+            lineChart.get(2).getData().add(avgEnergyLineChartPair.getValue());
+            lineChart.get(3).getData().add(avgAnimalsLiveSPanLineChartPair.getValue());
+            lineChart.get(4).getData().add(avgAnimalsChildrenNumberLineChartPair.getValue());
+        }
+
     }
 
     private Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> createLineChart(String xAxisLabel, String yAxisLabel, String chartTitle) {
@@ -67,7 +78,6 @@ public class StatisticsEngine implements Runnable {
         XYChart.Series<Number, Number> lineChartDataSeries = new XYChart.Series<>();
         lineChart.getData().add(lineChartDataSeries);
         lineChart.setCreateSymbols(false);
-        lineChart.setLegendVisible(false);
         return new Pair<>(lineChart, lineChartDataSeries);
     }
 
@@ -103,7 +113,7 @@ public class StatisticsEngine implements Runnable {
         chartList.get(lineCharts.ordinal()).add(data);
     }
 
-    public LineChart<Number, Number> getLineChart(LineCharts lineCharts) {
+    public static LineChart<Number, Number> getLineChart(LineCharts lineCharts) {
         return lineChart.get(lineCharts.ordinal());
     }
 

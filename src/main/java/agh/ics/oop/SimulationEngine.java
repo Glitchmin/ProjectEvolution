@@ -12,7 +12,7 @@ public class SimulationEngine implements IEngine, Runnable {
     Integer moveDelayMs = 50;
     private boolean isPaused = false;
     public StatisticsEngine statisticsEngine;
-    private AnimalTracker animalTracker;
+    private final AnimalTracker animalTracker;
 
     @Override
     public void addDayObserver(IDayChangeObserver observer) {
@@ -202,6 +202,7 @@ public class SimulationEngine implements IEngine, Runnable {
                 addGrassToMap();
                 addStatistics();
                 newDayHasCome();
+                out.println(this + " "+statisticsEngine.getDaysCounter());
 
                 try {
                     Thread.sleep(moveDelayMs);
