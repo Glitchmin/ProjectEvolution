@@ -133,7 +133,7 @@ public class StatisticsEngine implements Runnable {
         for (Double val: chartDataList.get(i)){
             sum += val;
         }
-        return sum/chartDataList.size();
+        return sum/chartDataList.get(i).size();
     }
 
     public void getStatsToFile(){
