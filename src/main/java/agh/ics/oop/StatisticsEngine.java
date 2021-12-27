@@ -140,7 +140,6 @@ public class StatisticsEngine implements Runnable {
         try {
             PrintWriter writer = new PrintWriter("Data.csv");
             StringBuilder stringBuilder = new StringBuilder();
-            out.println(chartDataList.get(0).size());
             for (int i=0; i<chartDataList.get(0).size();i++){
                 for (int j=0;j<5;j++){
                     stringBuilder.append(chartDataList.get(j).get(i).toString()).append(",");
@@ -152,7 +151,6 @@ public class StatisticsEngine implements Runnable {
             }
             writer.write(stringBuilder.toString());
             writer.close();
-            out.println("done");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
