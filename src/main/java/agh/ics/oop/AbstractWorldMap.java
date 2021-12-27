@@ -1,8 +1,12 @@
 package agh.ics.oop;
 
+import javafx.util.Pair;
+
 import java.util.*;
 
-abstract public class AbstractWorldMap implements IPositionChangeObserver {
+import static java.lang.System.out;
+
+abstract public class AbstractWorldMap {
 
     final public MapObjectsHandler mapObjectsHandler = new MapObjectsHandler();
     private static double jungleRatio;
@@ -52,10 +56,6 @@ abstract public class AbstractWorldMap implements IPositionChangeObserver {
         AbstractWorldMap.height = height;
     }
 
-    public boolean isOccupied(Vector2d position) {
-        return mapObjectsHandler.isOccupied(position);
-    }
-
 
     public List<IMapElement> objectsAt(Vector2d position) {
         return mapObjectsHandler.objectAt(position);
@@ -65,19 +65,10 @@ abstract public class AbstractWorldMap implements IPositionChangeObserver {
         return mapObjectsHandler.getMapElementsList();
     }
 
-    public String toString() {
-        MapVisualizer mapVisualizer = new MapVisualizer(this);
-        return mapVisualizer.draw(new Vector2d(0, 0), new Vector2d(width, height));
-    }
-
-    @Override
-    public void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
-        mapObjectsHandler.positionChanged(oldPosition, newPosition, object);
-    }
 
     public void place(Animal animal) {
+        animal.addObserver(mapObjectsHandler);
         mapObjectsHandler.addAnimal(animal);
-        animal.addObserver(this);
     }
 
     public List<Animal> getAliveAnimals() {
@@ -92,13 +83,18 @@ abstract public class AbstractWorldMap implements IPositionChangeObserver {
         return mapObjectsHandler.getObjectPositions();
     }
 
-    public void addGrasses() {
+    public Pair<Vector2d,Vector2d> addGrasses() {
+        Vector2d junglePosition=null;
+        Vector2d noJunglePosition=null;
         if (mapObjectsHandler.isThereAFreeJunglePosition()){
-            mapObjectsHandler.addGrass(mapObjectsHandler.getARandomFreeJunglePosition());
+            junglePosition = mapObjectsHandler.getARandomFreeJunglePosition();
+            mapObjectsHandler.addGrass(junglePosition);
         }
         if (mapObjectsHandler.isThereAFreeNoJunglePosition()){
-            mapObjectsHandler.addGrass(mapObjectsHandler.getARandomFreeNoJunglePosition());
+            noJunglePosition = mapObjectsHandler.getARandomFreeNoJunglePosition();
+            mapObjectsHandler.addGrass(noJunglePosition);
         }
+        return new Pair<>(junglePosition, noJunglePosition);
     }
 
     public void removeGrass(Vector2d position) {

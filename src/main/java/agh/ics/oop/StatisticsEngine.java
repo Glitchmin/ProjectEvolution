@@ -18,8 +18,8 @@ public class StatisticsEngine implements Runnable {
 
 
     private Vector<Vector<Integer>> chartList;
-    private static final Vector< LineChart<Number, Number> > lineChart = new Vector<>();
-    private final Vector< XYChart.Series<Number, Number> > lineChartDataSeries;
+    private static final Vector<LineChart<Number, Number>> lineChart = new Vector<>();
+    private final Vector<XYChart.Series<Number, Number>> lineChartDataSeries;
 
     private List<Integer> liveSpans;
 
@@ -31,7 +31,7 @@ public class StatisticsEngine implements Runnable {
         genotypeLabelString = "";
         daysCounter = 0;
         chartList = new Vector<>();
-        for (int i=0; i<5;i++){
+        for (int i = 0; i < 5; i++) {
             chartList.add(new Vector<>());
         }
         lineChartDataSeries = new Vector<>();
@@ -52,13 +52,13 @@ public class StatisticsEngine implements Runnable {
         Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsChildrenNumberLineChartPair = createLineChart("Number of days", "Average children amount", "Average animal children amount over time");
         lineChartDataSeries.add(avgAnimalsChildrenNumberLineChartPair.getValue());
 
-        if (lineChart.isEmpty()){
+        if (lineChart.isEmpty()) {
             lineChart.add(aliveAnimalsCounterLineChartPair.getKey());
             lineChart.add(grassCounterLineChartPair.getKey());
             lineChart.add(avgEnergyLineChartPair.getKey());
             lineChart.add(avgAnimalsLiveSPanLineChartPair.getKey());
             lineChart.add(avgAnimalsChildrenNumberLineChartPair.getKey());
-        }else{
+        } else {
             lineChart.get(0).getData().add(aliveAnimalsCounterLineChartPair.getValue());
             lineChart.get(1).getData().add(grassCounterLineChartPair.getValue());
             lineChart.get(2).getData().add(avgEnergyLineChartPair.getValue());
@@ -79,6 +79,17 @@ public class StatisticsEngine implements Runnable {
         lineChart.getData().add(lineChartDataSeries);
         lineChart.setCreateSymbols(false);
         return new Pair<>(lineChart, lineChartDataSeries);
+    }
+
+    public List<Vector2d> getDominantGenotypesPositions(){
+        List<Vector2d> dominantGenotypesPositions = new Vector<>();
+        for (Animal animal : map.getAliveAnimals()){
+            if (Arrays.toString(animal.getGenotype()).equals(genotypeLabelString)){
+                dominantGenotypesPositions.add(animal.getPosition());
+            }
+        }
+
+        return dominantGenotypesPositions;
     }
 
 
@@ -127,6 +138,9 @@ public class StatisticsEngine implements Runnable {
         for (Animal animal : map.getAliveAnimals()) {
             energySum += animal.getEnergy();
         }
+        if (map.getAliveAnimalsCounter() == 0) {
+            return 0;
+        }
         return energySum / map.getAliveAnimalsCounter();
     }
 
@@ -145,6 +159,9 @@ public class StatisticsEngine implements Runnable {
         int childrenCount = 0;
         for (Animal animal : map.getAliveAnimals()) {
             childrenCount += animal.getChildrenCounter();
+        }
+        if (map.getAliveAnimalsCounter()==0){
+            return 0;
         }
         return childrenCount / map.getAliveAnimalsCounter();
     }

@@ -17,7 +17,7 @@ import java.util.List;
 import static java.lang.System.out;
 
 
-public class App extends Application implements IDayChangeObserver, IPositionChangeObserver {
+public class App extends Application implements IDayChangeObserver {
 
     private GridPane gridPaneOfEverything;
     private Stage primaryStage;
@@ -26,8 +26,6 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
     private List<TextField> menuTextFields;
     private SimulationVisualizer leftMapSimulationVisualizer;
     private SimulationVisualizer rightMapSimulationVisualizer;
-    private Button leftMapPauseButton;
-    private Button rightMapPauseButton;
     private CheckBox leftMagicCheckBox;
     private CheckBox rightMagicCheckBox;
     private Label leftMagicCounterLabel;
@@ -53,14 +51,6 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
 
         buttonStart.setOnAction(actionEvent -> {
             startASimulation();
-
-            leftMapPauseButton.setOnAction(actionEvent1 -> {
-                leftMapEngine.pausePlayButtonPressed();
-            });
-
-            rightMapPauseButton.setOnAction(actionEvent1 -> {
-                rightMapEngine.pausePlayButtonPressed();
-            });
         });
     }
 
@@ -69,27 +59,39 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         gridPaneOfEverything.setMaxWidth(1400);
     }
 
-    private void startASimulationEngine(SimulationEngine engine, SimulationVisualizer simulationVisualizer, Button pauseButton, int columnIndex, boolean isLeft, Label magicCounterLabel) {
+    private void startASimulationEngine(SimulationEngine engine, SimulationVisualizer simulationVisualizer, int columnIndex, boolean isLeft, Label magicCounterLabel) {
+        Button pauseButton = new Button("Pause/Play");
         VBox middleVBox = new VBox(StatisticsEngine.getLineChart(LineCharts.aliveAnimalsCounter), StatisticsEngine.getLineChart(LineCharts.grassCounter),
                 StatisticsEngine.getLineChart(LineCharts.avgEnergy), StatisticsEngine.getLineChart(LineCharts.avgAnimalsLiveSpan),
                 StatisticsEngine.getLineChart(LineCharts.avgAnimalsChildrenNumber));
         middleVBox.setMaxWidth(400);
         VBox leftSideVBox;
-            leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), pauseButton, new Label("Dominant Genotype:"),
-                    engine.statisticsEngine.getGenotypeLabel(),
-                    new Label("Tracker:"), simulationVisualizer.getObservedAnimalVBox(), magicCounterLabel);
+        Button getDominantGenotypeButton = new Button("Show dominant genotype animals");
+        leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), new HBox(pauseButton,getDominantGenotypeButton), new Label("Dominant Genotype:"),
+                engine.statisticsEngine.getGenotypeLabel(),
+                new Label("Tracker:"), simulationVisualizer.getObservedAnimalVBox(), magicCounterLabel);
         gridPaneOfEverything.add(leftSideVBox, columnIndex, 0);
 
         gridPaneOfEverything.add(middleVBox, 1, 0);
         addGripPaneConstraints();
-        engine.addPositionObserver(this);
+        engine.addPositionObserver(simulationVisualizer);
         engine.addDayObserver(this);
+
+        pauseButton.setOnAction(actionEvent -> {
+            engine.pausePlayButtonPressed();
+        });
+
+        getDominantGenotypeButton.setOnAction(actionEvent -> {
+            if (engine.isPaused()) {
+                simulationVisualizer.markDominantGenotypes(engine.statisticsEngine.getDominantGenotypesPositions());
+            }
+        });
 
     }
 
     private void startASimulation() {
-        leftMagicCounterLabel = new Label("hmm");
-        rightMagicCounterLabel = new Label("hmm1");
+        leftMagicCounterLabel = new Label("");
+        rightMagicCounterLabel = new Label("");
         AnimalTracker leftAnimalTracker = new AnimalTracker();
         AnimalTracker rightAnimalTracker = new AnimalTracker();
         getParamsFromMenuTextFields();
@@ -98,16 +100,15 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         AbstractWorldMap rightMap = new WalledMap();
         leftMapSimulationVisualizer = new SimulationVisualizer(leftMap, leftAnimalTracker);
         rightMapSimulationVisualizer = new SimulationVisualizer(rightMap, rightAnimalTracker);
-        leftMapPauseButton = new Button("Pause/Play");
-        rightMapPauseButton = new Button("Pause/Play");
 
 
         leftMapEngine = new SimulationEngine(leftMap, Integer.parseInt(menuTextFields.get(5).getText()), leftAnimalTracker, leftMagicCheckBox.isSelected());
         rightMapEngine = new SimulationEngine(rightMap, Integer.parseInt(menuTextFields.get(5).getText()), rightAnimalTracker, rightMagicCheckBox.isSelected());
 
 
-        startASimulationEngine(leftMapEngine, leftMapSimulationVisualizer, leftMapPauseButton, 0, true, leftMagicCounterLabel);
-        startASimulationEngine(rightMapEngine, rightMapSimulationVisualizer, rightMapPauseButton, 2, false, rightMagicCounterLabel);
+        startASimulationEngine(leftMapEngine, leftMapSimulationVisualizer, 0, true, leftMagicCounterLabel);
+        startASimulationEngine(rightMapEngine, rightMapSimulationVisualizer, 2, false, rightMagicCounterLabel);
+
 
         Thread leftEngineThread = new Thread(leftMapEngine);
         leftEngineThread.start();
@@ -195,8 +196,4 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
 
     }
 
-    @Override
-    public void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
-        //simulationVisualizer.positionChanged(oldPosition,newPosition,object);
-    }
 }

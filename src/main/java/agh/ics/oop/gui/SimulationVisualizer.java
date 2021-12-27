@@ -1,8 +1,6 @@
 package agh.ics.oop.gui;
 
 import agh.ics.oop.*;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -15,7 +13,7 @@ import java.util.List;
 
 import static java.lang.System.out;
 
-public class SimulationVisualizer implements Runnable {
+public class SimulationVisualizer implements Runnable, IPositionChangeObserver {
     private final AbstractWorldMap map;
     private final GridPane simulationGridPane;
     private final TreeMap<Vector2d, List<VBox>> vBoxListMap;
@@ -26,6 +24,9 @@ public class SimulationVisualizer implements Runnable {
     private final Label observedAnimalChildrenLabel;
     private final Label observedAnimalOffspringLabel;
     private final Label observedAnimalDeathLabel;
+    private final List<Vector2d> positionsToUpdate;
+
+    private List<VBox> marksList;
 
     private final AnimalTracker animalTracker;
 
@@ -51,7 +52,9 @@ public class SimulationVisualizer implements Runnable {
     }
 
     SimulationVisualizer(AbstractWorldMap map, AnimalTracker animalTracker) {
+        this.marksList = new Vector<>();
         this.animalTracker = animalTracker;
+        this.positionsToUpdate = new Vector<>();
         observedAnimalPositionLabel = new Label();
         observedAnimalChildrenLabel = new Label();
         observedAnimalOffspringLabel = new Label();
@@ -124,10 +127,13 @@ public class SimulationVisualizer implements Runnable {
     }
 
     public void run() {
-        for (int i = 0; i < AbstractWorldMap.getWidth(); i++) {
-            for (int j = 0; j < AbstractWorldMap.getHeight(); j++) {
-                updateGridPaneNode(new Vector2d(i, j));
-            }
+        List<Vector2d> positionsToUpdateCopy = new Vector<>(positionsToUpdate);
+        for (Vector2d position:positionsToUpdateCopy){
+            updateGridPaneNode(position);
+        }
+        positionsToUpdate.clear();
+        for (VBox vBox: marksList){
+            simulationGridPane.getChildren().remove(vBox);
         }
         updateObservedAnimalVBox();
     }
@@ -151,13 +157,30 @@ public class SimulationVisualizer implements Runnable {
         }
     }
 
+
+    public void markDominantGenotypes(List <Vector2d> positionsList){
+        for (Vector2d position: positionsList) {
+            try {
+                VBox vBox =new GuiElementBox("src/main/resources/mark.png").getVBox();
+                simulationGridPane.add(vBox, position.x, position.y);
+                marksList.add(vBox);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public VBox getObservedAnimalVBox() {
         return observedAnimalVBox;
     }
 
     public void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
-        updateGridPaneNode(oldPosition);
-        updateGridPaneNode(newPosition);
+        if (oldPosition.equals(newPosition)){
+            positionsToUpdate.add(oldPosition);
+            return;
+        }
+        positionsToUpdate.add(oldPosition);
+        positionsToUpdate.add(newPosition);
     }
 
 }

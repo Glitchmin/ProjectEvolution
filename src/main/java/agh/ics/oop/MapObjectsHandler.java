@@ -48,6 +48,7 @@ public class MapObjectsHandler implements IPositionChangeObserver {
 
 
 
+
     MapObjectsHandler(){
         for (int i=0; i<AbstractWorldMap.getWidth();i++){
             for (int j=0; j<AbstractWorldMap.getHeight();j++){
@@ -70,17 +71,8 @@ public class MapObjectsHandler implements IPositionChangeObserver {
         add(newPosition, object);
     }
 
-    public boolean isOccupied(Vector2d position){
-        if (objectPositions.get(position)==null) {
-            return false;
-        }else{
-            for (IMapElement iMapElement: objectPositions.get(position)){
-                if (iMapElement instanceof Animal){
-                    return true;
-                }
-            }
-        }
-        return false;
+    public boolean isOccupied(Vector2d position) {
+        return objectPositions.get(position) != null;
     }
 
     public List<IMapElement> objectAt(Vector2d position) {
@@ -131,8 +123,10 @@ public class MapObjectsHandler implements IPositionChangeObserver {
     }
 
     private void remove(Vector2d position, IMapElement object) {
-        objectPositions.get(position).remove(object);
-        if (objectPositions.get(position).isEmpty()) {
+        if (objectPositions.containsKey(position)) {
+            objectPositions.get(position).remove(object);
+        }
+        if (objectPositions.containsKey(position) && objectPositions.get(position).isEmpty()) {
             objectPositions.remove(position);
             addAFreePosition(position);
         }

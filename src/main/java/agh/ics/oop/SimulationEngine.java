@@ -154,6 +154,7 @@ public class SimulationEngine implements IEngine, Runnable {
             }
             if (highestEnergy != null) {
                 map.removeGrass(position);
+                positionChanged(position,position,null);
             }
         }
     }
@@ -163,7 +164,13 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     private void addGrassToMap() {
-        map.addGrasses();
+        Pair<Vector2d, Vector2d> addedGrasses = map.addGrasses();
+        if (addedGrasses.getKey()!=null) {
+            positionChanged(addedGrasses.getKey(), addedGrasses.getKey(), null);
+        }
+        if (addedGrasses.getValue()!=null) {
+            positionChanged(addedGrasses.getValue(), addedGrasses.getValue(), null);
+        }
     }
 
     private Pair<Animal, Animal> get2StrongestAnimalsAtPos(SortedMap<Vector2d, List<IMapElement>> objectPositions, Vector2d position) {
@@ -244,6 +251,7 @@ public class SimulationEngine implements IEngine, Runnable {
                 }
             }
         }
+        out.println("they all died");
     }
 
 }
