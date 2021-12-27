@@ -6,6 +6,8 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.util.Pair;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 
 import static java.lang.System.out;
@@ -17,22 +19,20 @@ public class StatisticsEngine implements Runnable {
     private String genotypeLabelString;
 
 
-    private Vector<Vector<Integer>> chartList;
+    private final Vector<Vector<Double>> chartDataList;
     private static final Vector<LineChart<Number, Number>> lineChart = new Vector<>();
     private final Vector<XYChart.Series<Number, Number>> lineChartDataSeries;
 
-    private List<Integer> liveSpans;
 
 
     public StatisticsEngine(AbstractWorldMap map) {
         this.map = map;
-        liveSpans = new Vector<Integer>();
         genotypeLabel = new Label("");
         genotypeLabelString = "";
         daysCounter = 0;
-        chartList = new Vector<>();
+        chartDataList = new Vector<>();
         for (int i = 0; i < 5; i++) {
-            chartList.add(new Vector<>());
+            chartDataList.add(new Vector<>());
         }
         lineChartDataSeries = new Vector<>();
 
@@ -95,19 +95,19 @@ public class StatisticsEngine implements Runnable {
 
     public void run() {
         for (int i = 0; i < 5; i++) {
-            updateLineChartDataSeries(lineChartDataSeries.get(i), lastElement(chartList.get(i)));
+            updateLineChartDataSeries(lineChartDataSeries.get(i), lastElement(chartDataList.get(i)));
         }
         genotypeLabel.setText(genotypeLabelString);
     }
 
-    public Integer lastElement(List<Integer> list) {
+    public Double lastElement(List<Double> list) {
         if (list.isEmpty()) {
-            return 0;
+            return 0.0;
         }
         return list.get(list.size() - 1);
     }
 
-    public void updateLineChartDataSeries(XYChart.Series<Number, Number> lineChartDataSeries, int newValue) {
+    public void updateLineChartDataSeries(XYChart.Series<Number, Number> lineChartDataSeries, Double newValue) {
         lineChartDataSeries.getData().add(new XYChart.Data<>(daysCounter, newValue));
     }
 
@@ -120,50 +120,76 @@ public class StatisticsEngine implements Runnable {
         return daysCounter;
     }
 
-    public void addData(LineCharts lineCharts, Integer data) {
-        chartList.get(lineCharts.ordinal()).add(data);
+    public void addData(LineCharts lineCharts, Double data) {
+        chartDataList.get(lineCharts.ordinal()).add(data);
     }
 
     public static LineChart<Number, Number> getLineChart(LineCharts lineCharts) {
         return lineChart.get(lineCharts.ordinal());
     }
 
-    public void addDeadAnimalLiveSpan(Integer liveSpan) {
-        liveSpans.add(liveSpan);
+    private Double getAvg(int i){
+        Double sum = 0.0;
+        for (Double val: chartDataList.get(i)){
+            sum += val;
+        }
+        return sum/chartDataList.size();
+    }
+
+    public void getStatsToFile(){
+        try {
+            PrintWriter writer = new PrintWriter("Data.csv");
+            StringBuilder stringBuilder = new StringBuilder();
+            out.println(chartDataList.get(0).size());
+            for (int i=0; i<chartDataList.get(0).size();i++){
+                for (int j=0;j<5;j++){
+                    stringBuilder.append(chartDataList.get(j).get(i).toString()).append(",");
+                }
+                stringBuilder.append("\n");
+            }
+            for (int i=0; i<5;i++) {
+                stringBuilder.append(getAvg(i)).append(",");
+            }
+            writer.write(stringBuilder.toString());
+            writer.close();
+            out.println("done");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
 
-    public int getAvgEnergy() {
+    public Double getAvgEnergy() {
         int energySum = 0;
         for (Animal animal : map.getAliveAnimals()) {
             energySum += animal.getEnergy();
         }
         if (map.getAliveAnimalsCounter() == 0) {
-            return 0;
+            return 0.0;
         }
-        return energySum / map.getAliveAnimalsCounter();
+        return (double)energySum / map.getAliveAnimalsCounter();
     }
 
-    public int getAvgLiveSpan() {
-        if (liveSpans.isEmpty()) {
-            return 0;
+    public Double getAvgLiveSpan() {
+        if (chartDataList.get(LineCharts.avgAnimalsLiveSpan.ordinal()).isEmpty()) {
+            return 0.0;
         }
         int liveSpanSum = 0;
-        for (int liveSpan : liveSpans) {
+        for (Double liveSpan : chartDataList.get(LineCharts.avgAnimalsLiveSpan.ordinal())) {
             liveSpanSum += liveSpan;
         }
-        return liveSpanSum / liveSpans.size();
+        return (double)liveSpanSum / chartDataList.get(LineCharts.avgAnimalsLiveSpan.ordinal()).size();
     }
 
-    public int getAvgChildrenCount() {
+    public Double getAvgChildrenCount() {
         int childrenCount = 0;
         for (Animal animal : map.getAliveAnimals()) {
             childrenCount += animal.getChildrenCounter();
         }
         if (map.getAliveAnimalsCounter()==0){
-            return 0;
+            return 0.0;
         }
-        return childrenCount / map.getAliveAnimalsCounter();
+        return (double)childrenCount / map.getAliveAnimalsCounter();
     }
 
     public void updateMostPopularGenotype() {

@@ -103,12 +103,12 @@ abstract public class AbstractWorldMap {
 
     public abstract Vector2d positionAfterMove(Vector2d oldPosition, Vector2d moveVector);
 
-    public int getAliveAnimalsCounter() {
-        return mapObjectsHandler.getAliveAnimals().size();
+    public Double getAliveAnimalsCounter() {
+        return (double) mapObjectsHandler.getAliveAnimals().size();
     }
 
-    public int getGrassCounter() {
-        return mapObjectsHandler.getGrassPositionsList().size();
+    public Double getGrassCounter() {
+        return (double) mapObjectsHandler.getGrassPositionsList().size();
     }
 
 

@@ -67,7 +67,8 @@ public class App extends Application implements IDayChangeObserver {
         middleVBox.setMaxWidth(400);
         VBox leftSideVBox;
         Button getDominantGenotypeButton = new Button("Show dominant genotype animals");
-        leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), new HBox(pauseButton,getDominantGenotypeButton), new Label("Dominant Genotype:"),
+        Button getDataToFileButton = new Button("Get data to file");
+        leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), new HBox(pauseButton,getDominantGenotypeButton, getDataToFileButton), new Label("Dominant Genotype:"),
                 engine.statisticsEngine.getGenotypeLabel(),
                 new Label("Tracker:"), simulationVisualizer.getObservedAnimalVBox(), magicCounterLabel);
         gridPaneOfEverything.add(leftSideVBox, columnIndex, 0);
@@ -77,8 +78,12 @@ public class App extends Application implements IDayChangeObserver {
         engine.addPositionObserver(simulationVisualizer);
         engine.addDayObserver(this);
 
-        pauseButton.setOnAction(actionEvent -> {
-            engine.pausePlayButtonPressed();
+        pauseButton.setOnAction(actionEvent -> engine.pausePlayButtonPressed());
+
+        getDataToFileButton.setOnAction(actionEvent -> {
+            if (engine.isPaused()) {
+                engine.statisticsEngine.getStatsToFile();
+            }
         });
 
         getDominantGenotypeButton.setOnAction(actionEvent -> {

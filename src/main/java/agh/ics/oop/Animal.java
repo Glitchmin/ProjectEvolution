@@ -112,7 +112,6 @@ public class Animal implements IMapElement {
             genotype[i]=rn.nextInt(8);
         }
         Arrays.sort(genotype);
-        out.println(Arrays.toString(genotype));
     }
 
     @Override

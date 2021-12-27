@@ -93,7 +93,7 @@ public class SimulationEngine implements IEngine, Runnable {
                 if (animal == animalTracker.getAnimal()) {
                     animalTracker.justDied(statisticsEngine.getDaysCounter());
                 }
-                statisticsEngine.addDeadAnimalLiveSpan(statisticsEngine.getDaysCounter() - animal.getDayOfBirth());
+                statisticsEngine.addData(LineCharts.avgAnimalsLiveSpan, (double) (statisticsEngine.getDaysCounter() - animal.getDayOfBirth()));
                 map.removeAnimal(animal);
                 map.getAliveAnimals().remove(animal);
             }
@@ -159,7 +159,7 @@ public class SimulationEngine implements IEngine, Runnable {
         }
     }
 
-    public int getAliveAnimalsCounter() {
+    public Double getAliveAnimalsCounter() {
         return map.getAliveAnimalsCounter();
     }
 
