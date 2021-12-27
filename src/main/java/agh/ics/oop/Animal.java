@@ -85,28 +85,29 @@ public class Animal implements IMapElement {
             System.arraycopy(parent1.genotype, 32-howManyGenesDoesP1Give, this.genotype, 32-howManyGenesDoesP1Give, howManyGenesDoesP1Give);
         }
         Arrays.sort(this.genotype);
-        /*out.print(parent1.energy);
-        out.print(" ");
-        out.print(parent2.energy);
-        out.print(" ");
-        out.println(doesP1GetRightSide);
-
-        out.println(Arrays.toString(parent1.genotype));
-        out.println(Arrays.toString(parent2.genotype));
-        out.println(Arrays.toString(this.genotype));
-        out.print("zwierzak powstal na skutek SEXU haha");
-        out.println(Arrays.toString(this.genotype));*/
     }
 
+    public Animal(Animal animalToCopy, Vector2d position, int dayOfBirth){
+        Random rn = new Random();
+        this.dayOfBirth = dayOfBirth;
+        this.position = position;
+        this.direction = MapDirection.values()[rn.nextInt(8)];
+        this.childrenCounter=0;
+        this.genotype = animalToCopy.genotype;
+        this.energy = startEnergy;
+        this.map = animalToCopy.map;
+    }
+
+
     public Animal(AbstractWorldMap map, Vector2d initialPos, int dayOfBirth) {
+        Random rn = new Random();
         this.dayOfBirth = dayOfBirth;
         this.position = initialPos;
-        this.direction = MapDirection.NORTH;
+        this.direction = MapDirection.values()[rn.nextInt(8)];;
         this.map = map;
         this.childrenCounter=0;
         this.energy = startEnergy;
         this.genotype = new int[32];
-        Random rn = new Random();
         for (int i=0; i<32;i++){
             genotype[i]=rn.nextInt(8);
         }

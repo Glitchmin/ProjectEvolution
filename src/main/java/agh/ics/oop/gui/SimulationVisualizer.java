@@ -41,11 +41,13 @@ public class SimulationVisualizer implements Runnable {
         }
     }
 
-    private void addToGuiElementsListMap(Vector2d position, GuiElementBox guiElementBox) {
+    private void addToGuiElementsListMap(Vector2d position, GuiElementBox guiElementBox, boolean isGrass) {
         vBoxListMap.computeIfAbsent(position, k -> new Vector<>());
         simulationGridPane.add(guiElementBox.getVBox(), position.x, position.y, 1, 1);
         guiElementBox.getVBox().setOnMouseClicked(Action -> checkGridPane(guiElementBox.getVBox()));
-        vBoxListMap.get(position).add(guiElementBox.getVBox());
+        if (!isGrass) {
+            vBoxListMap.get(position).add(guiElementBox.getVBox());
+        }
     }
 
     SimulationVisualizer(AbstractWorldMap map, AnimalTracker animalTracker) {
@@ -71,9 +73,21 @@ public class SimulationVisualizer implements Runnable {
         for (IMapElement mapElement : mapCopy) {
             try {
                 GuiElementBox guiElementBox = new GuiElementBox(mapElement);
-                addToGuiElementsListMap(mapElement.getPosition(), guiElementBox);
+                addToGuiElementsListMap(mapElement.getPosition(), guiElementBox, false);
             } catch (java.io.FileNotFoundException ex) {
                 out.println(ex);
+            }
+        }
+        for (int i = AbstractWorldMap.getJungleLowerLeft().x; i < AbstractWorldMap.getJungleLowerLeft().add(AbstractWorldMap.getJungleSize()).x; i++) {
+            for (int j = AbstractWorldMap.getJungleLowerLeft().y; j < AbstractWorldMap.getJungleLowerLeft().add(AbstractWorldMap.getJungleSize()).y; j++) {
+                Vector2d position = new Vector2d(i,j);
+                if (AbstractWorldMap.isInsideTheJungle(position)) {
+                    try {
+                        addToGuiElementsListMap(position, new GuiElementBox("src/main/resources/jungle.png"), true);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }
@@ -85,9 +99,7 @@ public class SimulationVisualizer implements Runnable {
             for (VBox vBoxFromList: vBoxListMap.get(position)){
                 if (vBox == vBoxFromList){
                     if (map.objectsAt(position)!=null) {
-                        for (Animal animal: map.getAliveAnimals()){
-                            animal.setIsTracked(false);
-                        }
+                        map.mapObjectsHandler.removeTrackingFromAnimals();
                         animalTracker.addAnimal((Animal) map.objectsAt(position).get(0));
                         updateObservedAnimalVBox();
                     }
@@ -96,11 +108,7 @@ public class SimulationVisualizer implements Runnable {
         }
     }
 
-    public void simulationPaused(boolean isPaused){
-        if (isPaused) {
 
-        }
-    }
 
     public GridPane getSimulationGridPane() {
         return simulationGridPane;
@@ -126,16 +134,16 @@ public class SimulationVisualizer implements Runnable {
 
     private void updateGridPaneNode(Vector2d position) {
         if (vBoxListMap.get(position) != null) {
-            for (VBox vBox: vBoxListMap.get(position)){
+            for (VBox vBox : vBoxListMap.get(position)) {
                 simulationGridPane.getChildren().remove(vBox);
             }
             vBoxListMap.get(position).clear();
         }
-        List<IMapElement> mapElementList = map.objectsAt(position);
-        if (mapElementList != null) {
+        if (map.objectsAt(position) != null) {
+        List<IMapElement> mapElementList = new Vector<>(map.objectsAt(position));
             for (IMapElement mapElement : mapElementList) {
                 try {
-                    addToGuiElementsListMap(position, new GuiElementBox(mapElement));
+                    addToGuiElementsListMap(position, new GuiElementBox(mapElement),false);
                 } catch (java.io.FileNotFoundException ex) {
                     out.println(ex);
                 }

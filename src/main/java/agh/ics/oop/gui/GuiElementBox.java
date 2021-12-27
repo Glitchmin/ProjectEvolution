@@ -56,7 +56,24 @@ public class GuiElementBox {
         vBox.setPrefHeight(width);
         vBox.setPrefWidth(height);
         vBox.setAlignment(Pos.CENTER);
+    }
 
+    public GuiElementBox (String resourcePath) throws FileNotFoundException{
+        Image image;
+        if (imagesMap.get(resourcePath)!=null){
+            image=imagesMap.get(resourcePath);
+        }else {
+            image = new Image(new FileInputStream(resourcePath));
+            imagesMap.put(resourcePath, image);
+        }
+
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
+        vBox = new VBox(imageView);
+        vBox.setPrefHeight(width);
+        vBox.setPrefWidth(height);
+        vBox.setAlignment(Pos.CENTER);
     }
 
     public VBox getVBox() {

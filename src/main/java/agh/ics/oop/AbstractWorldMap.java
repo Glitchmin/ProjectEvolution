@@ -8,6 +8,25 @@ abstract public class AbstractWorldMap implements IPositionChangeObserver {
     private static double jungleRatio;
     protected static int width;
     protected static int height;
+    private static Vector2d jungleSize;
+    private static Vector2d jungleLowerLeft;
+
+    public static void calculateJungleSize() {
+        jungleSize = new Vector2d((int) (width * jungleRatio), (int) (height * jungleRatio));
+        jungleLowerLeft = new Vector2d(width / 2 - jungleSize.x / 2, height / 2 - jungleSize.y / 2);
+    }
+
+    public static boolean isInsideTheJungle(Vector2d position) {
+        return position.follows(jungleLowerLeft) && position.precedes(jungleLowerLeft.add(jungleSize));
+    }
+
+    public static Vector2d getJungleSize() {
+        return jungleSize;
+    }
+
+    public static Vector2d getJungleLowerLeft() {
+        return jungleLowerLeft;
+    }
 
     public static double getJungleRatio() {
         return jungleRatio;
@@ -42,15 +61,13 @@ abstract public class AbstractWorldMap implements IPositionChangeObserver {
         return mapObjectsHandler.objectAt(position);
     }
 
-    
     public List<IMapElement> getCopyOfMapElements() {
         return mapObjectsHandler.getMapElementsList();
     }
 
-
     public String toString() {
         MapVisualizer mapVisualizer = new MapVisualizer(this);
-        return mapVisualizer.draw(new Vector2d(0,0), new Vector2d(width,height));
+        return mapVisualizer.draw(new Vector2d(0, 0), new Vector2d(width, height));
     }
 
     @Override
@@ -58,16 +75,16 @@ abstract public class AbstractWorldMap implements IPositionChangeObserver {
         mapObjectsHandler.positionChanged(oldPosition, newPosition, object);
     }
 
-    public void place(Animal animal){
-            mapObjectsHandler.addAnimal(animal);
-            animal.addObserver(this);
+    public void place(Animal animal) {
+        mapObjectsHandler.addAnimal(animal);
+        animal.addObserver(this);
     }
 
     public List<Animal> getAliveAnimals() {
         return mapObjectsHandler.getAliveAnimals();
     }
 
-    public void removeAnimal (Animal animal){
+    public void removeAnimal(Animal animal) {
         mapObjectsHandler.removeAnimal(animal);
     }
 
@@ -75,25 +92,26 @@ abstract public class AbstractWorldMap implements IPositionChangeObserver {
         return mapObjectsHandler.getObjectPositions();
     }
 
-    public void addGrasses(){
-        Random rn = new Random();
-        Vector2d position = new Vector2d(rn.nextInt(width), rn.nextInt(height) );
-        while(!mapObjectsHandler.addGrass(position)){
-            position = new Vector2d(rn.nextInt(width), rn.nextInt(height) );
+    public void addGrasses() {
+        if (mapObjectsHandler.isThereAFreeJunglePosition()){
+            mapObjectsHandler.addGrass(mapObjectsHandler.getARandomFreeJunglePosition());
+        }
+        if (mapObjectsHandler.isThereAFreeNoJunglePosition()){
+            mapObjectsHandler.addGrass(mapObjectsHandler.getARandomFreeNoJunglePosition());
         }
     }
 
-    public void removeGrass(Vector2d position){
+    public void removeGrass(Vector2d position) {
         mapObjectsHandler.removeGrass(position);
     }
 
     public abstract Vector2d positionAfterMove(Vector2d oldPosition, Vector2d moveVector);
 
-    public int getAliveAnimalsCounter(){
+    public int getAliveAnimalsCounter() {
         return mapObjectsHandler.getAliveAnimals().size();
     }
 
-    public int getGrassCounter(){
+    public int getGrassCounter() {
         return mapObjectsHandler.getGrassPositionsList().size();
     }
 

@@ -3,9 +3,9 @@ package agh.ics.oop.gui;
 import agh.ics.oop.*;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
@@ -28,14 +28,10 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
     private SimulationVisualizer rightMapSimulationVisualizer;
     private Button leftMapPauseButton;
     private Button rightMapPauseButton;
-
-
-    private Label addCenteredLabel(GridPane gridPane, String text, int x, int y) {
-        Label label = new Label(text);
-        GridPane.setHalignment(label, HPos.CENTER);
-        gridPane.add(label, x, y, 1, 1);
-        return label;
-    }
+    private CheckBox leftMagicCheckBox;
+    private CheckBox rightMagicCheckBox;
+    private Label leftMagicCounterLabel;
+    private Label rightMagicCounterLabel;
 
 
     @Override
@@ -51,7 +47,7 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         addParamFieldsToMenu();
 
         Button buttonStart = new Button("Start!");
-        gridPaneOfEverything.add(buttonStart, 0, 7, 1, 1);
+        gridPaneOfEverything.add(buttonStart, 0, 9, 1, 1);
 
         Platform.runLater(primaryStage::show);
 
@@ -59,15 +55,11 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
             startASimulation();
 
             leftMapPauseButton.setOnAction(actionEvent1 -> {
-                out.println("lewy nac");
                 leftMapEngine.pausePlayButtonPressed();
-                leftMapSimulationVisualizer.simulationPaused(leftMapEngine.isPaused());
             });
 
             rightMapPauseButton.setOnAction(actionEvent1 -> {
-                out.println("prawy nac");
                 rightMapEngine.pausePlayButtonPressed();
-                rightMapSimulationVisualizer.simulationPaused(rightMapEngine.isPaused());
             });
         });
     }
@@ -77,20 +69,16 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         gridPaneOfEverything.setMaxWidth(1400);
     }
 
-    private void startASimulationEngine(AbstractWorldMap map, SimulationEngine engine,  SimulationVisualizer simulationVisualizer, Button pauseButton, int columnIndex, boolean isLeft){
+    private void startASimulationEngine(SimulationEngine engine, SimulationVisualizer simulationVisualizer, Button pauseButton, int columnIndex, boolean isLeft, Label magicCounterLabel) {
         VBox middleVBox = new VBox(StatisticsEngine.getLineChart(LineCharts.aliveAnimalsCounter), StatisticsEngine.getLineChart(LineCharts.grassCounter),
                 StatisticsEngine.getLineChart(LineCharts.avgEnergy), StatisticsEngine.getLineChart(LineCharts.avgAnimalsLiveSpan),
                 StatisticsEngine.getLineChart(LineCharts.avgAnimalsChildrenNumber));
-        middleVBox.setMaxWidth(200);
+        middleVBox.setMaxWidth(400);
         VBox leftSideVBox;
-        if (isLeft) {
             leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), pauseButton, new Label("Dominant Genotype:"),
                     engine.statisticsEngine.getGenotypeLabel(),
-                    new Label("Tracker:"), simulationVisualizer.getObservedAnimalVBox());
-        }else {
-            leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), pauseButton);
-        }
-        gridPaneOfEverything.add(leftSideVBox,columnIndex,0);
+                    new Label("Tracker:"), simulationVisualizer.getObservedAnimalVBox(), magicCounterLabel);
+        gridPaneOfEverything.add(leftSideVBox, columnIndex, 0);
 
         gridPaneOfEverything.add(middleVBox, 1, 0);
         addGripPaneConstraints();
@@ -100,22 +88,26 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
     }
 
     private void startASimulation() {
-        AnimalTracker animalTracker = new AnimalTracker();
+        leftMagicCounterLabel = new Label("hmm");
+        rightMagicCounterLabel = new Label("hmm1");
+        AnimalTracker leftAnimalTracker = new AnimalTracker();
+        AnimalTracker rightAnimalTracker = new AnimalTracker();
         getParamsFromMenuTextFields();
         gridPaneOfEverything.getChildren().clear();
         AbstractWorldMap leftMap = new WrappingMap();
         AbstractWorldMap rightMap = new WalledMap();
-        leftMapSimulationVisualizer = new SimulationVisualizer(leftMap, animalTracker);
-        rightMapSimulationVisualizer = new SimulationVisualizer(rightMap, animalTracker);
+        leftMapSimulationVisualizer = new SimulationVisualizer(leftMap, leftAnimalTracker);
+        rightMapSimulationVisualizer = new SimulationVisualizer(rightMap, rightAnimalTracker);
         leftMapPauseButton = new Button("Pause/Play");
         rightMapPauseButton = new Button("Pause/Play");
 
-        leftMapEngine = new SimulationEngine(leftMap, Integer.parseInt(menuTextFields.get(5).getText()), animalTracker);
-        rightMapEngine = new SimulationEngine(rightMap, Integer.parseInt(menuTextFields.get(5).getText()), animalTracker);
+
+        leftMapEngine = new SimulationEngine(leftMap, Integer.parseInt(menuTextFields.get(5).getText()), leftAnimalTracker, leftMagicCheckBox.isSelected());
+        rightMapEngine = new SimulationEngine(rightMap, Integer.parseInt(menuTextFields.get(5).getText()), rightAnimalTracker, rightMagicCheckBox.isSelected());
 
 
-        startASimulationEngine(leftMap, leftMapEngine, leftMapSimulationVisualizer, leftMapPauseButton,0, true);
-        startASimulationEngine(rightMap, rightMapEngine, rightMapSimulationVisualizer, rightMapPauseButton,2, false);
+        startASimulationEngine(leftMapEngine, leftMapSimulationVisualizer, leftMapPauseButton, 0, true, leftMagicCounterLabel);
+        startASimulationEngine(rightMapEngine, rightMapSimulationVisualizer, rightMapPauseButton, 2, false, rightMagicCounterLabel);
 
         Thread leftEngineThread = new Thread(leftMapEngine);
         leftEngineThread.start();
@@ -132,6 +124,7 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         Animal.setMoveEnergy(Integer.parseInt(menuTextFields.get(3).getText()));
         Animal.setPlantEnergy(Integer.parseInt(menuTextFields.get(4).getText()));
         AbstractWorldMap.setJungleRatio(Double.parseDouble(menuTextFields.get(6).getText()));
+        AbstractWorldMap.calculateJungleSize();
         out.println("test:");
         for (int i = 0; i < 6; i++) {
             out.println(menuTextFields.get(i).getText());
@@ -150,7 +143,10 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         TextField jungleParamTextField = new TextField("0.5");
         gridPaneOfEverything.add(new HBox(new Label("Jungle Ratio"), jungleParamTextField), 0, 6, 1, 1);
         menuTextFields.add(jungleParamTextField);
-
+        leftMagicCheckBox = new CheckBox();
+        rightMagicCheckBox = new CheckBox();
+        gridPaneOfEverything.add(new HBox(new Label("Magical strategy for wrapped map: "), leftMagicCheckBox), 0, 7);
+        gridPaneOfEverything.add(new HBox(new Label("Magical strategy for walled map: "), rightMagicCheckBox), 0, 8);
 
     }
 
@@ -168,10 +164,24 @@ public class App extends Application implements IDayChangeObserver, IPositionCha
         Platform.runLater(this::updateView);
         if (!leftMapEngine.isPaused()) {
             Platform.runLater(leftMapEngine.statisticsEngine::newDayHasCome);
+            Platform.runLater(this::updateLeftMagicCounterLabel);
         }
         if (!rightMapEngine.isPaused()) {
             Platform.runLater(rightMapEngine.statisticsEngine::newDayHasCome);
+            Platform.runLater(this::updateRightMagicCounterLabel);
         }
+    }
+
+    private void updateRightMagicCounterLabel() {
+        updateMagicCounterLabel(rightMagicCounterLabel, rightMapEngine);
+    }
+
+    private void updateLeftMagicCounterLabel() {
+        updateMagicCounterLabel(leftMagicCounterLabel, leftMapEngine);
+    }
+
+    private void updateMagicCounterLabel(Label leftMagicCounterLabel, SimulationEngine leftMapEngine) {
+        leftMagicCounterLabel.setText("Magic situations left: " + leftMapEngine.getMagicCounter());
     }
 
     private void updateView() {
