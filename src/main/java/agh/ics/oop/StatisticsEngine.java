@@ -22,8 +22,10 @@ public class StatisticsEngine implements Runnable {
     private final Vector<XYChart.Series<Number, Number>> lineChartDataSeries;
     private final String mapName;
 
+    private final List<Integer> lifeSpansList;
 
     public StatisticsEngine(AbstractWorldMap map, String mapName) {
+        lifeSpansList = new Vector<>();
         this.map = map;
         this.mapName = mapName;
         genotypeLabel = new Label("");
@@ -91,6 +93,9 @@ public class StatisticsEngine implements Runnable {
         return dominantGenotypesPositions;
     }
 
+    public void addALifespan(Integer lifespan){
+        lifeSpansList.add(lifespan);
+    }
 
     public void run() {
         for (int i = 0; i < 5; i++) {
@@ -137,8 +142,8 @@ public class StatisticsEngine implements Runnable {
 
     public void getStatsToFile() {
         try {
-            PrintWriter writer = new PrintWriter(mapName + getDaysCounter() + ".csv");
-            StringBuilder stringBuilder = new StringBuilder();
+            PrintWriter writer = new PrintWriter(mapName +"Day"+ getDaysCounter() + ".csv");
+            StringBuilder stringBuilder = new StringBuilder("Animal amount, Grass amount, Average animal energy, Average animal lifespan, Average animal children amount");
             for (int i = 0; i < chartDataList.get(0).size(); i++) {
                 for (int j = 0; j < 5; j++) {
                     stringBuilder.append(chartDataList.get(j).get(i).toString()).append(",");
@@ -168,14 +173,14 @@ public class StatisticsEngine implements Runnable {
     }
 
     public Double getAvgLiveSpan() {
-        if (chartDataList.get(LineCharts.avgAnimalsLiveSpan.ordinal()).isEmpty()) {
+        if (lifeSpansList.isEmpty()) {
             return 0.0;
         }
         int liveSpanSum = 0;
-        for (Double liveSpan : chartDataList.get(LineCharts.avgAnimalsLiveSpan.ordinal())) {
+        for (Integer liveSpan : lifeSpansList) {
             liveSpanSum += liveSpan;
         }
-        return (double) liveSpanSum / chartDataList.get(LineCharts.avgAnimalsLiveSpan.ordinal()).size();
+        return (double) liveSpanSum / lifeSpansList.size();
     }
 
     public Double getAvgChildrenCount() {

@@ -14,6 +14,8 @@ public class SimulationEngine implements IEngine, Runnable {
     public StatisticsEngine statisticsEngine;
     private final AnimalTracker animalTracker;
     private int magicCounter;
+    List<IDayChangeObserver> dayObservers = new ArrayList<>();
+    List<IPositionChangeObserver> positionObservers = new ArrayList<>();
 
     public static void setMoveDelayMs(int moveDelayMs) {
         SimulationEngine.moveDelayMs = moveDelayMs;
@@ -65,6 +67,7 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     public void newDayHasCome() {
+        statisticsEngine.newDayHasCome();
         for (IDayChangeObserver observer : dayObservers) {
             observer.newDayHasCome();
         }
@@ -96,7 +99,7 @@ public class SimulationEngine implements IEngine, Runnable {
                 if (animal == animalTracker.getAnimal()) {
                     animalTracker.justDied(statisticsEngine.getDaysCounter());
                 }
-                statisticsEngine.addData(LineCharts.avgAnimalsLiveSpan, (double) (statisticsEngine.getDaysCounter() - animal.getDayOfBirth()));
+                statisticsEngine.addALifespan((statisticsEngine.getDaysCounter() - animal.getDayOfBirth()));
                 map.removeAnimal(animal);
                 map.getAliveAnimals().remove(animal);
             }
@@ -203,7 +206,6 @@ public class SimulationEngine implements IEngine, Runnable {
                 if (animal.isOffspringOfTrackedAnimal()) {
                     animalTracker.addToOffspringCounter();
                 }
-
             }
         }
     }

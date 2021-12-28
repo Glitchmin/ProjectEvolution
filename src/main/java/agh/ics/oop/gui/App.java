@@ -9,6 +9,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import static java.lang.System.out;
+
 
 public class App extends Application implements IDayChangeObserver {
 
@@ -130,11 +132,9 @@ public class App extends Application implements IDayChangeObserver {
     public void newDayHasCome() {
         Platform.runLater(this::updateView);
         if (!leftMapEngine.isPaused()) {
-            Platform.runLater(leftMapEngine.statisticsEngine::newDayHasCome);
             Platform.runLater(this::updateLeftMagicCounterLabel);
         }
         if (!rightMapEngine.isPaused()) {
-            Platform.runLater(rightMapEngine.statisticsEngine::newDayHasCome);
             Platform.runLater(this::updateRightMagicCounterLabel);
         }
     }
