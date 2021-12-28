@@ -2,10 +2,7 @@ package agh.ics.oop;
 
 import java.util.*;
 
-import static java.lang.System.out;
-
 public class MapObjectsHandler implements IPositionChangeObserver {
-
 
 
     SortedMap<Vector2d, List<IMapElement>> objectPositions = new TreeMap<>(Vector2d.xFirstComparator);
@@ -14,45 +11,45 @@ public class MapObjectsHandler implements IPositionChangeObserver {
     Set<Vector2d> freePositionsInTheJungle = new TreeSet<>(Vector2d.xFirstComparator);
     Set<Vector2d> freePositionsOutsideTheJungle = new TreeSet<>(Vector2d.xFirstComparator);
 
-    private void addAFreePosition(Vector2d position){
-        if (AbstractWorldMap.isInsideTheJungle(position)){
+    private void addAFreePosition(Vector2d position) {
+        if (AbstractWorldMap.isInsideTheJungle(position)) {
             freePositionsInTheJungle.add(position);
-        }else{
+        } else {
             freePositionsOutsideTheJungle.add(position);
         }
     }
 
-    private void removeAFreePosition(Vector2d position){
-        if (AbstractWorldMap.isInsideTheJungle(position)){
+    private void removeAFreePosition(Vector2d position) {
+        if (AbstractWorldMap.isInsideTheJungle(position)) {
             freePositionsInTheJungle.remove(position);
-        }else{
+        } else {
             freePositionsOutsideTheJungle.remove(position);
         }
     }
 
-    public boolean isThereAFreeJunglePosition(){
+    public boolean isThereAFreeJunglePosition() {
         return !freePositionsInTheJungle.isEmpty();
     }
-    public boolean isThereAFreeNoJunglePosition(){
+
+    public boolean isThereAFreeNoJunglePosition() {
         return !freePositionsOutsideTheJungle.isEmpty();
     }
-    public Vector2d getARandomFreeJunglePosition(){
-        int whichPosition=new Random().nextInt(freePositionsInTheJungle.size());
+
+    public Vector2d getARandomFreeJunglePosition() {
+        int whichPosition = new Random().nextInt(freePositionsInTheJungle.size());
         return (Vector2d) freePositionsInTheJungle.toArray()[whichPosition];
     }
-    public Vector2d getARandomFreeNoJunglePosition(){
-        int whichPosition=new Random().nextInt(freePositionsOutsideTheJungle.size());
+
+    public Vector2d getARandomFreeNoJunglePosition() {
+        int whichPosition = new Random().nextInt(freePositionsOutsideTheJungle.size());
         return (Vector2d) freePositionsOutsideTheJungle.toArray()[whichPosition];
     }
 
 
-
-
-
-    MapObjectsHandler(){
-        for (int i=0; i<AbstractWorldMap.getWidth();i++){
-            for (int j=0; j<AbstractWorldMap.getHeight();j++){
-                addAFreePosition(new Vector2d(i,j));
+    MapObjectsHandler() {
+        for (int i = 0; i < AbstractWorldMap.getWidth(); i++) {
+            for (int j = 0; j < AbstractWorldMap.getHeight(); j++) {
+                addAFreePosition(new Vector2d(i, j));
             }
         }
     }
@@ -90,17 +87,16 @@ public class MapObjectsHandler implements IPositionChangeObserver {
         remove(animal.getPosition(), animal);
     }
 
-    public boolean addGrass(Vector2d position) {
-        if (objectPositions.get(position) != null){
-            return false;
+    public void addGrass(Vector2d position) {
+        if (objectPositions.get(position) != null) {
+            return;
         }
         grassPositionsList.add(position);
         add(position, new Grass(position));
-        return true;
     }
 
     private Grass getGrassAtPos(Vector2d position) {
-        if (objectPositions.get(position) == null){
+        if (objectPositions.get(position) == null) {
             return null;
         }
         for (IMapElement iMapElement : objectPositions.get(position)) {
@@ -146,8 +142,8 @@ public class MapObjectsHandler implements IPositionChangeObserver {
         return grassPositionsList;
     }
 
-    public void removeTrackingFromAnimals(){
-        for (Animal animal:getAliveAnimals()){
+    public void removeTrackingFromAnimals() {
+        for (Animal animal : getAliveAnimals()) {
             animal.setIsTracked(false);
         }
     }

@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import static java.lang.System.out;
-
 public class Animal implements IMapElement {
     private Vector2d position;
     private MapDirection direction;
@@ -15,7 +13,7 @@ public class Animal implements IMapElement {
     private int energy;
     private final int dayOfBirth;
     private int childrenCounter;
-    final private int [] genotype;
+    final private int[] genotype;
     private boolean isOffspringOfTrackedAnimal;
     private boolean isTracked;
 
@@ -31,10 +29,6 @@ public class Animal implements IMapElement {
         Animal.startEnergy = startEnergy;
     }
 
-    public static int getMoveEnergy() {
-        return moveEnergy;
-    }
-
     public static void setMoveEnergy(int moveEnergy) {
         Animal.moveEnergy = moveEnergy;
     }
@@ -47,52 +41,54 @@ public class Animal implements IMapElement {
         Animal.plantEnergy = plantEnergy;
     }
 
-    public boolean isOutOfEnergy(){ return energy < 0; }
+    public boolean isOutOfEnergy() {
+        return energy < 0;
+    }
 
     public int getEnergy() {
         return energy;
     }
 
-    public void giveEnergy(int energyGiven){
-        energy+=energyGiven;
+    public void giveEnergy(int energyGiven) {
+        energy += energyGiven;
     }
 
-    public void subtractMoveEnergy(){
-        energy-=moveEnergy;
+    public void subtractMoveEnergy() {
+        energy -= moveEnergy;
     }
 
-    public Animal(Animal parent1, Animal parent2, int dayOfBirth){
+    public Animal(Animal parent1, Animal parent2, int dayOfBirth) {
         this.dayOfBirth = dayOfBirth;
-        this.childrenCounter=0;
+        this.childrenCounter = 0;
         parent1.childrenCounter++;
         parent2.childrenCounter++;
         this.isOffspringOfTrackedAnimal = parent1.isOffspringOfTrackedAnimal || parent2.isOffspringOfTrackedAnimal || parent1.isTracked || parent2.isTracked;
-        this.position = new Vector2d(parent1.getPosition().getX(), parent1.getPosition().getY());
+        this.position = new Vector2d(parent1.getPosition().x, parent1.getPosition().y);
         Random rn = new Random();
         this.direction = MapDirection.values()[rn.nextInt(8)];
         this.map = parent1.map;
-        this.energy = parent1.energy/4 + parent2.energy/4;
-        parent1.energy -= parent1.energy/4;
-        parent2.energy -= parent2.energy/4;
+        this.energy = parent1.energy / 4 + parent2.energy / 4;
+        parent1.energy -= parent1.energy / 4;
+        parent2.energy -= parent2.energy / 4;
         boolean doesP1GetRightSide = rn.nextBoolean();
-        int howManyGenesDoesP1Give = (32* parent1.energy)/(parent1.energy+ parent2.energy);
-        this.genotype=new int[32];
-        if (!doesP1GetRightSide){
+        int howManyGenesDoesP1Give = (32 * parent1.energy) / (parent1.energy + parent2.energy);
+        this.genotype = new int[32];
+        if (!doesP1GetRightSide) {
             System.arraycopy(parent1.genotype, 0, this.genotype, 0, howManyGenesDoesP1Give);
-            System.arraycopy(parent2.genotype, howManyGenesDoesP1Give, this.genotype, howManyGenesDoesP1Give, 32-howManyGenesDoesP1Give);
-        }else{
-            System.arraycopy(parent2.genotype, 0, this.genotype, 0, 32-howManyGenesDoesP1Give);
-            System.arraycopy(parent1.genotype, 32-howManyGenesDoesP1Give, this.genotype, 32-howManyGenesDoesP1Give, howManyGenesDoesP1Give);
+            System.arraycopy(parent2.genotype, howManyGenesDoesP1Give, this.genotype, howManyGenesDoesP1Give, 32 - howManyGenesDoesP1Give);
+        } else {
+            System.arraycopy(parent2.genotype, 0, this.genotype, 0, 32 - howManyGenesDoesP1Give);
+            System.arraycopy(parent1.genotype, 32 - howManyGenesDoesP1Give, this.genotype, 32 - howManyGenesDoesP1Give, howManyGenesDoesP1Give);
         }
         Arrays.sort(this.genotype);
     }
 
-    public Animal(Animal animalToCopy, Vector2d position, int dayOfBirth){
+    public Animal(Animal animalToCopy, Vector2d position, int dayOfBirth) {
         Random rn = new Random();
         this.dayOfBirth = dayOfBirth;
         this.position = position;
         this.direction = MapDirection.values()[rn.nextInt(8)];
-        this.childrenCounter=0;
+        this.childrenCounter = 0;
         this.genotype = animalToCopy.genotype;
         this.energy = startEnergy;
         this.map = animalToCopy.map;
@@ -103,13 +99,13 @@ public class Animal implements IMapElement {
         Random rn = new Random();
         this.dayOfBirth = dayOfBirth;
         this.position = initialPos;
-        this.direction = MapDirection.values()[rn.nextInt(8)];;
+        this.direction = MapDirection.values()[rn.nextInt(8)];
         this.map = map;
-        this.childrenCounter=0;
+        this.childrenCounter = 0;
         this.energy = startEnergy;
         this.genotype = new int[32];
-        for (int i=0; i<32;i++){
-            genotype[i]=rn.nextInt(8);
+        for (int i = 0; i < 32; i++) {
+            genotype[i] = rn.nextInt(8);
         }
         Arrays.sort(genotype);
     }
@@ -119,28 +115,20 @@ public class Animal implements IMapElement {
         return "src/main/resources/animal.png";
     }
 
-    public double getEnergySaturation(){
-        return (double)energy/(double)startEnergy;
+    public double getEnergySaturation() {
+        return (double) energy / (double) startEnergy;
     }
 
     public String toString() {
         return Integer.toString(energy);
     }
 
-    public MapDirection getDirection() {
-        return this.direction;
-    }
-
     public Vector2d getPosition() {
-        return new Vector2d(this.position.getX(), this.position.getY());
+        return new Vector2d(this.position.x, this.position.y);
     }
 
     public int[] getGenotype() {
         return genotype;
-    }
-
-    public boolean isAt(Vector2d position) {
-        return (this.position.equals(position));
     }
 
 
@@ -151,9 +139,9 @@ public class Animal implements IMapElement {
             case 0 -> moveVector = moveVector.add(this.direction.toUnitVector());
             case 4 -> moveVector = moveVector.subtract(this.direction.toUnitVector());
             default -> this.direction = this.direction.turnRightBy(direction);
-        };
-        positionChanged(this.position, map.positionAfterMove(position,moveVector),this);
-        this.position = map.positionAfterMove(position,moveVector);
+        }
+        positionChanged(this.position, map.positionAfterMove(position, moveVector), this);
+        this.position = map.positionAfterMove(position, moveVector);
 
     }
 
@@ -175,10 +163,10 @@ public class Animal implements IMapElement {
         return childrenCounter;
     }
 
-    public void setIsTracked(boolean isTracked){
+    public void setIsTracked(boolean isTracked) {
         this.isTracked = isTracked;
-        if (!isTracked){
-            this.isOffspringOfTrackedAnimal=false;
+        if (!isTracked) {
+            this.isOffspringOfTrackedAnimal = false;
         }
     }
 

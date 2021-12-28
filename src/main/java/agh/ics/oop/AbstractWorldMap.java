@@ -4,8 +4,6 @@ import javafx.util.Pair;
 
 import java.util.*;
 
-import static java.lang.System.out;
-
 abstract public class AbstractWorldMap {
 
     final public MapObjectsHandler mapObjectsHandler = new MapObjectsHandler();
@@ -30,10 +28,6 @@ abstract public class AbstractWorldMap {
 
     public static Vector2d getJungleLowerLeft() {
         return jungleLowerLeft;
-    }
-
-    public static double getJungleRatio() {
-        return jungleRatio;
     }
 
     public static void setJungleRatio(double jungleRatio) {
@@ -83,14 +77,14 @@ abstract public class AbstractWorldMap {
         return mapObjectsHandler.getObjectPositions();
     }
 
-    public Pair<Vector2d,Vector2d> addGrasses() {
-        Vector2d junglePosition=null;
-        Vector2d noJunglePosition=null;
-        if (mapObjectsHandler.isThereAFreeJunglePosition()){
+    public Pair<Vector2d, Vector2d> addGrasses() {
+        Vector2d junglePosition = null;
+        Vector2d noJunglePosition = null;
+        if (mapObjectsHandler.isThereAFreeJunglePosition()) {
             junglePosition = mapObjectsHandler.getARandomFreeJunglePosition();
             mapObjectsHandler.addGrass(junglePosition);
         }
-        if (mapObjectsHandler.isThereAFreeNoJunglePosition()){
+        if (mapObjectsHandler.isThereAFreeNoJunglePosition()) {
             noJunglePosition = mapObjectsHandler.getARandomFreeNoJunglePosition();
             mapObjectsHandler.addGrass(noJunglePosition);
         }

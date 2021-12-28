@@ -10,10 +10,8 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
 
-import static java.lang.System.out;
-
 public class StatisticsEngine implements Runnable {
-    private AbstractWorldMap map;
+    private final AbstractWorldMap map;
     private int daysCounter;
     private final Label genotypeLabel;
     private String genotypeLabelString;
@@ -22,7 +20,6 @@ public class StatisticsEngine implements Runnable {
     private final Vector<Vector<Double>> chartDataList;
     private static final Vector<LineChart<Number, Number>> lineChart = new Vector<>();
     private final Vector<XYChart.Series<Number, Number>> lineChartDataSeries;
-
 
 
     public StatisticsEngine(AbstractWorldMap map) {
@@ -37,19 +34,19 @@ public class StatisticsEngine implements Runnable {
         lineChartDataSeries = new Vector<>();
 
 
-        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> aliveAnimalsCounterLineChartPair = createLineChart("Number of days", "Number of animals", "Number of animals over time");
+        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> aliveAnimalsCounterLineChartPair = createLineChart("Number of animals", "Number of animals over time");
         lineChartDataSeries.add(aliveAnimalsCounterLineChartPair.getValue());
 
-        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> grassCounterLineChartPair = createLineChart("Number of days", "Number of grass fields", "Number of grass fields over time");
+        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> grassCounterLineChartPair = createLineChart("Number of grass fields", "Number of grass fields over time");
         lineChartDataSeries.add(grassCounterLineChartPair.getValue());
 
-        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgEnergyLineChartPair = createLineChart("Number of days", "Average energy", "Average animal energy over time");
+        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgEnergyLineChartPair = createLineChart("Average energy", "Average animal energy over time");
         lineChartDataSeries.add(avgEnergyLineChartPair.getValue());
 
-        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsLiveSPanLineChartPair = createLineChart("Number of days", "Average live span", "Average animal live span over time");
+        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsLiveSPanLineChartPair = createLineChart("Average live span", "Average animal live span over time");
         lineChartDataSeries.add(avgAnimalsLiveSPanLineChartPair.getValue());
 
-        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsChildrenNumberLineChartPair = createLineChart("Number of days", "Average children amount", "Average animal children amount over time");
+        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsChildrenNumberLineChartPair = createLineChart("Average children amount", "Average animal children amount over time");
         lineChartDataSeries.add(avgAnimalsChildrenNumberLineChartPair.getValue());
 
         if (lineChart.isEmpty()) {
@@ -68,10 +65,10 @@ public class StatisticsEngine implements Runnable {
 
     }
 
-    private Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> createLineChart(String xAxisLabel, String yAxisLabel, String chartTitle) {
+    private Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> createLineChart(String yAxisLabel, String chartTitle) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel(xAxisLabel);
+        xAxis.setLabel("Number of days");
         yAxis.setLabel(yAxisLabel);
         LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle(chartTitle);
@@ -81,10 +78,10 @@ public class StatisticsEngine implements Runnable {
         return new Pair<>(lineChart, lineChartDataSeries);
     }
 
-    public List<Vector2d> getDominantGenotypesPositions(){
+    public List<Vector2d> getDominantGenotypesPositions() {
         List<Vector2d> dominantGenotypesPositions = new Vector<>();
-        for (Animal animal : map.getAliveAnimals()){
-            if (Arrays.toString(animal.getGenotype()).equals(genotypeLabelString)){
+        for (Animal animal : map.getAliveAnimals()) {
+            if (Arrays.toString(animal.getGenotype()).equals(genotypeLabelString)) {
                 dominantGenotypesPositions.add(animal.getPosition());
             }
         }
@@ -128,25 +125,25 @@ public class StatisticsEngine implements Runnable {
         return lineChart.get(lineCharts.ordinal());
     }
 
-    private Double getAvg(int i){
+    private Double getAvg(int i) {
         Double sum = 0.0;
-        for (Double val: chartDataList.get(i)){
+        for (Double val : chartDataList.get(i)) {
             sum += val;
         }
-        return sum/chartDataList.get(i).size();
+        return sum / chartDataList.get(i).size();
     }
 
-    public void getStatsToFile(){
+    public void getStatsToFile() {
         try {
             PrintWriter writer = new PrintWriter("Data.csv");
             StringBuilder stringBuilder = new StringBuilder();
-            for (int i=0; i<chartDataList.get(0).size();i++){
-                for (int j=0;j<5;j++){
+            for (int i = 0; i < chartDataList.get(0).size(); i++) {
+                for (int j = 0; j < 5; j++) {
                     stringBuilder.append(chartDataList.get(j).get(i).toString()).append(",");
                 }
                 stringBuilder.append("\n");
             }
-            for (int i=0; i<5;i++) {
+            for (int i = 0; i < 5; i++) {
                 stringBuilder.append(getAvg(i)).append(",");
             }
             writer.write(stringBuilder.toString());
@@ -165,7 +162,7 @@ public class StatisticsEngine implements Runnable {
         if (map.getAliveAnimalsCounter() == 0) {
             return 0.0;
         }
-        return (double)energySum / map.getAliveAnimalsCounter();
+        return (double) energySum / map.getAliveAnimalsCounter();
     }
 
     public Double getAvgLiveSpan() {
@@ -176,7 +173,7 @@ public class StatisticsEngine implements Runnable {
         for (Double liveSpan : chartDataList.get(LineCharts.avgAnimalsLiveSpan.ordinal())) {
             liveSpanSum += liveSpan;
         }
-        return (double)liveSpanSum / chartDataList.get(LineCharts.avgAnimalsLiveSpan.ordinal()).size();
+        return (double) liveSpanSum / chartDataList.get(LineCharts.avgAnimalsLiveSpan.ordinal()).size();
     }
 
     public Double getAvgChildrenCount() {
@@ -184,10 +181,10 @@ public class StatisticsEngine implements Runnable {
         for (Animal animal : map.getAliveAnimals()) {
             childrenCount += animal.getChildrenCounter();
         }
-        if (map.getAliveAnimalsCounter()==0){
+        if (map.getAliveAnimalsCounter() == 0) {
             return 0.0;
         }
-        return (double)childrenCount / map.getAliveAnimalsCounter();
+        return (double) childrenCount / map.getAliveAnimalsCounter();
     }
 
     public void updateMostPopularGenotype() {

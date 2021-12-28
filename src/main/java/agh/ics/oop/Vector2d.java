@@ -13,7 +13,7 @@ public class Vector2d {
     final public int y;
 
     public String toString() {
-        return "(" + Integer.toString(this.x) + "," + Integer.toString(y) + ")";
+        return "(" + this.x + "," + y + ")";
     }
 
     public boolean precedes(Vector2d other) {
@@ -22,14 +22,6 @@ public class Vector2d {
 
     public boolean follows(Vector2d other) {
         return (this.x >= other.x && this.y >= other.y);
-    }
-
-    public Vector2d upperRight(Vector2d other) {
-        return new Vector2d(Math.max(this.x, other.x), Math.max(this.y, other.y));
-    }
-
-    public Vector2d lowerLeft(Vector2d other) {
-        return new Vector2d(Math.min(this.x, other.x), Math.min(this.y, other.y));
     }
 
 
@@ -44,9 +36,8 @@ public class Vector2d {
     public boolean equals(Object other) {
         if (this == other)
             return true;
-        if (!(other instanceof Vector2d))
+        if (!(other instanceof Vector2d that))
             return false;
-        Vector2d that = (Vector2d) other;
         return (that.x == this.x && that.y == this.y);
     }
 
@@ -59,26 +50,18 @@ public class Vector2d {
         return Objects.hash(this.x, this.y);
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
     public static Comparator<Vector2d> xFirstComparator = (a, b) -> {
-        if (a.getX() == b.getX() && a.getY() == b.getY()) {
+        if (a.x == b.x && a.y == b.y) {
             return 0;
         }
-        if (a.getX() == b.getX()) {
-            if (a.getY() > b.getY()) {
+        if (a.x == b.x) {
+            if (a.y > b.y) {
                 return 1;
             } else {
                 return -1;
             }
         }
-        if (a.getX() > b.getX()) {
+        if (a.x > b.x) {
             return 1;
         } else {
             return -1;

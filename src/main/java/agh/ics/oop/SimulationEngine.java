@@ -154,7 +154,7 @@ public class SimulationEngine implements IEngine, Runnable {
             }
             if (highestEnergy != null) {
                 map.removeGrass(position);
-                positionChanged(position,position,null);
+                positionChanged(position, position, null);
             }
         }
     }
@@ -165,10 +165,10 @@ public class SimulationEngine implements IEngine, Runnable {
 
     private void addGrassToMap() {
         Pair<Vector2d, Vector2d> addedGrasses = map.addGrasses();
-        if (addedGrasses.getKey()!=null) {
+        if (addedGrasses.getKey() != null) {
             positionChanged(addedGrasses.getKey(), addedGrasses.getKey(), null);
         }
-        if (addedGrasses.getValue()!=null) {
+        if (addedGrasses.getValue() != null) {
             positionChanged(addedGrasses.getValue(), addedGrasses.getValue(), null);
         }
     }

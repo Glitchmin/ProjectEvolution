@@ -5,5 +5,5 @@ public enum LineCharts {
     grassCounter,
     avgEnergy,
     avgAnimalsLiveSpan,
-    avgAnimalsChildrenNumber;
+    avgAnimalsChildrenNumber
 }

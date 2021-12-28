@@ -8,63 +8,67 @@ public class AnimalTracker {
     private boolean isDead;
     private Integer deathDay;
     private Integer offspringCounter;
-    public AnimalTracker(){
+
+    public AnimalTracker() {
         this.animal = null;
     }
-    public void addAnimal(Animal animal){
+
+    public void addAnimal(Animal animal) {
         this.animal = animal;
         animal.setIsTracked(true);
         childrenCounterWhenChosen = animal.getChildrenCounter();
-        this.isDead=false;
-        this.offspringCounter=0;
-    }
-    public String getChildrenCounter(){
-        if (animal == null){
-            return "No animal tracked";
-        }
-        return "Children amount: "+Integer.toString(animal.getChildrenCounter() - childrenCounterWhenChosen);
-    }
-    public String getPosition(){
-        if (animal == null){
-            return "No animal tracked";
-        }
-        return "Position: "+animal.getPosition().toString();
+        this.isDead = false;
+        this.offspringCounter = 0;
     }
 
-    public String getGenotype(){
-        if (animal == null){
+    public String getChildrenCounter() {
+        if (animal == null) {
             return "No animal tracked";
         }
-        return "Genotype: "+Arrays.toString(animal.getGenotype());
+        return "Children amount: " + (animal.getChildrenCounter() - childrenCounterWhenChosen);
+    }
+
+    public String getPosition() {
+        if (animal == null) {
+            return "No animal tracked";
+        }
+        return "Position: " + animal.getPosition().toString();
+    }
+
+    public String getGenotype() {
+        if (animal == null) {
+            return "No animal tracked";
+        }
+        return "Genotype: " + Arrays.toString(animal.getGenotype());
     }
 
     public Animal getAnimal() {
         return animal;
     }
 
-    public String getDeathDay(){
-        if (animal == null){
+    public String getDeathDay() {
+        if (animal == null) {
             return "No animal tracked";
         }
-        if (!isDead){
+        if (!isDead) {
             return "still alive";
         }
-        return "Death day: "+deathDay.toString();
+        return "Death day: " + deathDay.toString();
     }
 
-    public void justDied(int deathDay){
-        isDead=true;
+    public void justDied(int deathDay) {
+        isDead = true;
         this.deathDay = deathDay;
     }
 
-    public void addToOffspringCounter(){
+    public void addToOffspringCounter() {
         offspringCounter++;
     }
 
     public String getOffspringCounter() {
-        if (animal == null){
+        if (animal == null) {
             return "No animal tracked";
         }
-        return "Offsprings amount: "+offspringCounter.toString();
+        return "Offsprings amount: " + offspringCounter.toString();
     }
 }

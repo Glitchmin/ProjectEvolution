@@ -31,6 +31,12 @@ public class App extends Application implements IDayChangeObserver {
     private Label leftMagicCounterLabel;
     private Label rightMagicCounterLabel;
 
+    private final static int windowWidth = 1400;
+    private final static int windowHeight = 850;
+    public final static int simulationGripPaneWidth = 500;
+    public final static int simulationGripPaneHeight = 500;
+    private final static int plotsColumnWidth = 400;
+
 
     @Override
     public void init() {
@@ -39,36 +45,39 @@ public class App extends Application implements IDayChangeObserver {
     private void renderMenu() {
         gridPaneOfEverything = new GridPane();
         gridPaneOfEverything.getChildren().clear();
-        Scene scene = new Scene(gridPaneOfEverything, 1400, 700);
+        Scene scene = new Scene(gridPaneOfEverything, windowWidth, windowHeight);
         primaryStage.setScene(scene);
 
         addParamFieldsToMenu();
 
         Button buttonStart = new Button("Start!");
-        gridPaneOfEverything.add(buttonStart, 0, 9, 1, 1);
+        gridPaneOfEverything.add(buttonStart, 0, 9);
 
         Platform.runLater(primaryStage::show);
 
-        buttonStart.setOnAction(actionEvent -> {
-            startASimulation();
-        });
+        buttonStart.setOnAction(actionEvent -> startASimulation());
     }
 
     private void addGripPaneConstraints() {
-        gridPaneOfEverything.setMaxHeight(800);
-        gridPaneOfEverything.setMaxWidth(1400);
+        gridPaneOfEverything.setMaxHeight(windowHeight);
+        gridPaneOfEverything.setMaxWidth(windowWidth);
     }
 
-    private void startASimulationEngine(SimulationEngine engine, SimulationVisualizer simulationVisualizer, int columnIndex, boolean isLeft, Label magicCounterLabel) {
+    private void startASimulationEngine(SimulationEngine engine, SimulationVisualizer simulationVisualizer, boolean isLeft, Label magicCounterLabel) {
+        int columnIndex = 0;
+        if (!isLeft) {
+            columnIndex = 2;
+        }
         Button pauseButton = new Button("Pause/Play");
         VBox middleVBox = new VBox(StatisticsEngine.getLineChart(LineCharts.aliveAnimalsCounter), StatisticsEngine.getLineChart(LineCharts.grassCounter),
                 StatisticsEngine.getLineChart(LineCharts.avgEnergy), StatisticsEngine.getLineChart(LineCharts.avgAnimalsLiveSpan),
                 StatisticsEngine.getLineChart(LineCharts.avgAnimalsChildrenNumber));
-        middleVBox.setMaxWidth(400);
+
+        middleVBox.setMaxWidth(plotsColumnWidth);
         VBox leftSideVBox;
         Button getDominantGenotypeButton = new Button("Show dominant genotype animals");
         Button getDataToFileButton = new Button("Get data to file");
-        leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), new HBox(pauseButton,getDominantGenotypeButton, getDataToFileButton), new Label("Dominant Genotype:"),
+        leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), new HBox(pauseButton, getDominantGenotypeButton, getDataToFileButton), new Label("Dominant Genotype:"),
                 engine.statisticsEngine.getGenotypeLabel(),
                 new Label("Tracker:"), simulationVisualizer.getObservedAnimalVBox(), magicCounterLabel);
         gridPaneOfEverything.add(leftSideVBox, columnIndex, 0);
@@ -111,8 +120,8 @@ public class App extends Application implements IDayChangeObserver {
         rightMapEngine = new SimulationEngine(rightMap, Integer.parseInt(menuTextFields.get(5).getText()), rightAnimalTracker, rightMagicCheckBox.isSelected());
 
 
-        startASimulationEngine(leftMapEngine, leftMapSimulationVisualizer, 0, true, leftMagicCounterLabel);
-        startASimulationEngine(rightMapEngine, rightMapSimulationVisualizer, 2, false, rightMagicCounterLabel);
+        startASimulationEngine(leftMapEngine, leftMapSimulationVisualizer, true, leftMagicCounterLabel);
+        startASimulationEngine(rightMapEngine, rightMapSimulationVisualizer, false, rightMagicCounterLabel);
 
 
         Thread leftEngineThread = new Thread(leftMapEngine);
@@ -140,7 +149,7 @@ public class App extends Application implements IDayChangeObserver {
     private void addParamFieldsToMenu() {
         String[] intParamNames = {"Width", "Height", "Start Energy", "Move Energy", "Plant Energy", "Amount of Animals"};
         menuTextFields = new ArrayList<>();
-        Integer[] intParamsDefaults = {30, 30, 100, 1, 100, 10};
+        Integer[] intParamsDefaults = {30, 30, 100, 1, 100, 20};
         for (int i = 0; i < 6; i++) {
             TextField intParamTextField = new TextField(intParamsDefaults[i].toString());
             gridPaneOfEverything.add(new HBox(new Label(intParamNames[i]), intParamTextField), 0, i, 1, 1);
@@ -158,7 +167,7 @@ public class App extends Application implements IDayChangeObserver {
 
     public void start(Stage primaryStage) {
         gridPaneOfEverything = new GridPane();
-        Scene scene = new Scene(gridPaneOfEverything, 1400, 850);
+        Scene scene = new Scene(gridPaneOfEverything, windowWidth, windowHeight);
         primaryStage.setScene(scene);
         this.primaryStage = primaryStage;
         Platform.runLater(primaryStage::show);
