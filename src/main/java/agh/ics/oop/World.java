@@ -1,4 +1,5 @@
 package agh.ics.oop;
+//Adam Kulczycki
 
 import agh.ics.oop.gui.App;
 import javafx.application.Application;

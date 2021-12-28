@@ -81,12 +81,19 @@ public class App extends Application implements IDayChangeObserver {
         engine.addPositionObserver(simulationVisualizer);
         engine.addDayObserver(this);
 
+        getDataToFileButton.setDisable(true);
+        showDominantGenotypeButton.setDisable(true);
+
         pauseButton.setOnAction(actionEvent -> {
             engine.pausePlayButtonPressed();
             if (engine.isPaused()) {
                 pauseButton.setText("Play");
+                getDataToFileButton.setDisable(false);
+                showDominantGenotypeButton.setDisable(false);
             } else {
                 pauseButton.setText("Pause");
+                getDataToFileButton.setDisable(true);
+                showDominantGenotypeButton.setDisable(true);
             }
         });
 
