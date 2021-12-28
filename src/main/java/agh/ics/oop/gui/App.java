@@ -3,10 +3,12 @@ package agh.ics.oop.gui;
 import agh.ics.oop.*;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class App extends Application implements IDayChangeObserver {
@@ -60,11 +62,20 @@ public class App extends Application implements IDayChangeObserver {
         VBox leftSideVBox;
         Button showDominantGenotypeButton = new Button("Show dominant genotype animals");
         Button getDataToFileButton = new Button("Get data to file");
+
+        Label mapNameLabel = new Label("Wrapped map");
+        mapNameLabel.setTextFill(Color.rgb(243, 98, 45));
+        if (!isLeft) {
+            mapNameLabel.setText("Walled map");
+            mapNameLabel.setTextFill(Color.rgb(251, 167, 27));
+        }
+        gridPaneOfEverything.add(mapNameLabel, columnIndex, 0);
+        GridPane.setHalignment(mapNameLabel, HPos.CENTER);
         leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), new HBox(pauseButton, showDominantGenotypeButton, getDataToFileButton), new Label("Dominant genotype:"),
                 engine.statisticsEngine.getGenotypeLabel(),
                 new Label("Tracker:"), simulationVisualizer.getObservedAnimalVBox(), magicCounterLabel);
-        gridPaneOfEverything.add(leftSideVBox, columnIndex, 0);
-        gridPaneOfEverything.add(middleVBox, 1, 0);
+        gridPaneOfEverything.add(leftSideVBox, columnIndex, 1);
+        gridPaneOfEverything.add(middleVBox, 1, 1);
         addGripPaneConstraints();
 
         engine.addPositionObserver(simulationVisualizer);
@@ -72,9 +83,9 @@ public class App extends Application implements IDayChangeObserver {
 
         pauseButton.setOnAction(actionEvent -> {
             engine.pausePlayButtonPressed();
-            if (engine.isPaused()){
+            if (engine.isPaused()) {
                 pauseButton.setText("Play");
-            }else{
+            } else {
                 pauseButton.setText("Pause");
             }
         });

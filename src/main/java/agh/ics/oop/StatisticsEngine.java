@@ -19,7 +19,7 @@ public class StatisticsEngine implements Runnable, IDayChangeObserver {
     private String genotypeLabelString;
 
     private final Vector<Vector<Double>> chartDataList;
-    private static final Vector<LineChart<Number, Number>> lineChart = new Vector<>();
+    private static final Vector<LineChart<Number, Number>> lineChartsList = new Vector<>();
     private final Vector<XYChart.Series<Number, Number>> lineChartDataSeries;
     private final List<Integer> lifeSpansList;
 
@@ -53,19 +53,22 @@ public class StatisticsEngine implements Runnable, IDayChangeObserver {
         Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsChildrenNumberLineChartPair = createLineChart("Average animal children amount over time");
         lineChartDataSeries.add(avgAnimalsChildrenNumberLineChartPair.getValue());
 
-        if (lineChart.isEmpty()) {
-            lineChart.add(aliveAnimalsCounterLineChartPair.getKey());
-            lineChart.add(grassCounterLineChartPair.getKey());
-            lineChart.add(avgEnergyLineChartPair.getKey());
-            lineChart.add(avgAnimalsLiveSPanLineChartPair.getKey());
-            lineChart.add(avgAnimalsChildrenNumberLineChartPair.getKey());
+        if (lineChartsList.isEmpty()) {
+            lineChartsList.add(aliveAnimalsCounterLineChartPair.getKey());
+            lineChartsList.add(grassCounterLineChartPair.getKey());
+            lineChartsList.add(avgEnergyLineChartPair.getKey());
+            lineChartsList.add(avgAnimalsLiveSPanLineChartPair.getKey());
+            lineChartsList.add(avgAnimalsChildrenNumberLineChartPair.getKey());
         } else {
-            lineChart.get(0).getData().add(aliveAnimalsCounterLineChartPair.getValue());
-            lineChart.get(1).getData().add(grassCounterLineChartPair.getValue());
-            lineChart.get(2).getData().add(avgEnergyLineChartPair.getValue());
-            lineChart.get(3).getData().add(avgAnimalsLiveSPanLineChartPair.getValue());
-            lineChart.get(4).getData().add(avgAnimalsChildrenNumberLineChartPair.getValue());
+            lineChartsList.get(0).getData().add(aliveAnimalsCounterLineChartPair.getValue());
+            lineChartsList.get(1).getData().add(grassCounterLineChartPair.getValue());
+            lineChartsList.get(2).getData().add(avgEnergyLineChartPair.getValue());
+            lineChartsList.get(3).getData().add(avgAnimalsLiveSPanLineChartPair.getValue());
+            lineChartsList.get(4).getData().add(avgAnimalsChildrenNumberLineChartPair.getValue());
         }
+        lineChartsList.get(4).setLegendVisible(true);
+        lineChartDataSeries.get(4).setName(mapName);
+
     }
 
     private Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> createLineChart(String chartTitle) {
@@ -119,7 +122,7 @@ public class StatisticsEngine implements Runnable, IDayChangeObserver {
     }
 
     public static LineChart<Number, Number> getLineChart(LineCharts lineCharts) {
-        return lineChart.get(lineCharts.ordinal());
+        return lineChartsList.get(lineCharts.ordinal());
     }
 
     private Double getAvg(int i) {

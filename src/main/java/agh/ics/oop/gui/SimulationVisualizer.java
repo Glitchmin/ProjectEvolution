@@ -98,12 +98,19 @@ public class SimulationVisualizer implements Runnable, IPositionChangeObserver {
             for (VBox vBoxFromList : vBoxListMap.get(position)) {
                 if (vBox == vBoxFromList) {
                     if (map.objectsAt(position) != null) {
+                        Animal animalToTrack = null;
                         for (IMapElement mapElement : map.objectsAt(position)) {
                             if (mapElement instanceof Animal) {
-                                map.mapObjectsHandler.removeTrackingFromAnimals();
-                                animalTracker.addAnimal((Animal) mapElement);
-                                updateObservedAnimalVBox();
+                                Animal animal = (Animal) mapElement;
+                                if (animalToTrack == null || animal.getEnergy() > animalToTrack.getEnergy()) {
+                                    animalToTrack = animal;
+                                }
                             }
+                        }
+                        if (animalToTrack != null) {
+                            map.mapObjectsHandler.removeTrackingFromAnimals();
+                            animalTracker.addAnimal(animalToTrack);
+                            updateObservedAnimalVBox();
                         }
                     }
                 }
