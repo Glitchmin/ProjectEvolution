@@ -9,9 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-import static java.lang.System.out;
-
-
 public class App extends Application implements IDayChangeObserver {
 
     private GridPane gridPaneOfEverything;
@@ -29,7 +26,6 @@ public class App extends Application implements IDayChangeObserver {
     public final static int simulationGripPaneWidth = 500;
     public final static int simulationGripPaneHeight = 500;
     private final static int plotsColumnWidth = 400;
-
 
     @Override
     public void init() {
@@ -55,26 +51,33 @@ public class App extends Application implements IDayChangeObserver {
         if (!isLeft) {
             columnIndex = 2;
         }
-        Button pauseButton = new Button("Pause/Play");
+        Button pauseButton = new Button("Pause");
         VBox middleVBox = new VBox(StatisticsEngine.getLineChart(LineCharts.aliveAnimalsCounter), StatisticsEngine.getLineChart(LineCharts.grassCounter),
                 StatisticsEngine.getLineChart(LineCharts.avgEnergy), StatisticsEngine.getLineChart(LineCharts.avgAnimalsLiveSpan),
                 StatisticsEngine.getLineChart(LineCharts.avgAnimalsChildrenNumber));
-
         middleVBox.setMaxWidth(plotsColumnWidth);
+
         VBox leftSideVBox;
         Button showDominantGenotypeButton = new Button("Show dominant genotype animals");
         Button getDataToFileButton = new Button("Get data to file");
-        leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), new HBox(pauseButton, showDominantGenotypeButton, getDataToFileButton), new Label("Dominant Genotype:"),
+        leftSideVBox = new VBox(simulationVisualizer.getSimulationGridPane(), new HBox(pauseButton, showDominantGenotypeButton, getDataToFileButton), new Label("Dominant genotype:"),
                 engine.statisticsEngine.getGenotypeLabel(),
                 new Label("Tracker:"), simulationVisualizer.getObservedAnimalVBox(), magicCounterLabel);
         gridPaneOfEverything.add(leftSideVBox, columnIndex, 0);
-
         gridPaneOfEverything.add(middleVBox, 1, 0);
         addGripPaneConstraints();
+
         engine.addPositionObserver(simulationVisualizer);
         engine.addDayObserver(this);
 
-        pauseButton.setOnAction(actionEvent -> engine.pausePlayButtonPressed());
+        pauseButton.setOnAction(actionEvent -> {
+            engine.pausePlayButtonPressed();
+            if (engine.isPaused()){
+                pauseButton.setText("Play");
+            }else{
+                pauseButton.setText("Pause");
+            }
+        });
 
         getDataToFileButton.setOnAction(actionEvent -> {
             if (engine.isPaused()) {

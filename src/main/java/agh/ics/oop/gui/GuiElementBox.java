@@ -14,9 +14,9 @@ import java.util.Map;
 
 public class GuiElementBox {
     private final VBox vBox;
-    static private int width;
-    static private int height;
-    static private final Map<String, Image> imagesMap = new HashMap<>();
+    private static int width;
+    private static int height;
+    private static final Map<String, Image> imagesMap = new HashMap<>();
 
     public static void setWidth(int width) {
         GuiElementBox.width = width;

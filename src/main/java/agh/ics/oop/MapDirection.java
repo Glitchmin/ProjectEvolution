@@ -10,11 +10,9 @@ public enum MapDirection {
     WEST,
     NORTH_WEST;
 
-
     public MapDirection turnRightBy(int numberOfTurns) {
         return values()[(ordinal() + numberOfTurns) % values().length];
     }
-
 
     public Vector2d toUnitVector() {
         return switch (this) {

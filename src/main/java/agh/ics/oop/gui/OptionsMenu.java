@@ -46,26 +46,27 @@ public class OptionsMenu {
     }
 
     public int addParamFieldsToMenu(GridPane gridPaneOfEverything) {
-        String[] intParamNames = {"Width: ", "Height: ", "Start Energy: ", "Move Energy: ", "Plant energy: ", "Amount of animals: ", "Refresh time: "};
-        String[] intParamTextAfterTextField = {" Pixels", " Pixels", "", "", "", "", " ms"};
+        int currentRow = 0;
+        String[] intParamNames = {"Width: ", "Height: ", "Start energy: ", "Move energy: ", "Plant energy: ", "Amount of animals: ", "Day interval: "};
+        String[] intParamTextAfterTextField = {" pixels", " pixels", "", "", "", "", " ms"};
         menuTextFields = new ArrayList<>();
         Integer[] intParamsDefaults = {30, 30, 100, 1, 100, 20, 50};
         for (int i = 0; i < 7; i++) {
             TextField intParamTextField = new TextField(intParamsDefaults[i].toString());
-            gridPaneOfEverything.add(new Label(intParamNames[i]), 0, i);
-            gridPaneOfEverything.add(intParamTextField, 1, i);
-            gridPaneOfEverything.add(new Label(intParamTextAfterTextField[i]), 2, i);
+            gridPaneOfEverything.add(new Label(intParamNames[i]), 0, currentRow);
+            gridPaneOfEverything.add(intParamTextField, 1, currentRow);
+            gridPaneOfEverything.add(new Label(intParamTextAfterTextField[i]), 2, currentRow++);
             menuTextFields.add(intParamTextField);
         }
         TextField jungleParamTextField = new TextField("0.5");
-        gridPaneOfEverything.add(new Label("Jungle Ratio"), 0, 7);
-        gridPaneOfEverything.add(jungleParamTextField, 1, 7);
+        gridPaneOfEverything.add(new Label("Jungle ratio"), 0, currentRow);
+        gridPaneOfEverything.add(jungleParamTextField, 1, currentRow++);
         menuTextFields.add(jungleParamTextField);
-        gridPaneOfEverything.add(new Label("Magical strategy for wrapped map: "), 0, 8);
-        gridPaneOfEverything.add(leftMapMagicCheckBox, 1, 8);
-        gridPaneOfEverything.add(new Label("Magical strategy for walled map: "), 0, 9);
-        gridPaneOfEverything.add(rightMapMagicCheckBox, 1, 9);
-        return 10;
+        gridPaneOfEverything.add(new Label("Magical strategy for wrapped map: "), 0, currentRow);
+        gridPaneOfEverything.add(leftMapMagicCheckBox, 1, currentRow++);
+        gridPaneOfEverything.add(new Label("Magical strategy for walled map: "), 0, currentRow);
+        gridPaneOfEverything.add(rightMapMagicCheckBox, 1, currentRow++);
+        return currentRow;
     }
 
 }

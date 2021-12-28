@@ -6,7 +6,7 @@ import java.util.*;
 
 abstract public class AbstractWorldMap {
 
-    final public MapObjectsHandler mapObjectsHandler = new MapObjectsHandler();
+    public final MapObjectsHandler mapObjectsHandler = new MapObjectsHandler();
     private static double jungleRatio;
     protected static int width;
     protected static int height;
@@ -64,18 +64,6 @@ abstract public class AbstractWorldMap {
         mapObjectsHandler.addAnimal(animal);
     }
 
-    public List<Animal> getAliveAnimals() {
-        return mapObjectsHandler.getAliveAnimals();
-    }
-
-    public void removeAnimal(Animal animal) {
-        mapObjectsHandler.removeAnimal(animal);
-    }
-
-    public SortedMap<Vector2d, List<IMapElement>> getObjectPositions() {
-        return mapObjectsHandler.getObjectPositions();
-    }
-
     public Pair<Vector2d, Vector2d> addGrasses() {
         Vector2d junglePosition = null;
         Vector2d noJunglePosition = null;
@@ -88,10 +76,6 @@ abstract public class AbstractWorldMap {
             mapObjectsHandler.addGrass(noJunglePosition);
         }
         return new Pair<>(junglePosition, noJunglePosition);
-    }
-
-    public void removeGrass(Vector2d position) {
-        mapObjectsHandler.removeGrass(position);
     }
 
     public abstract Vector2d positionAfterMove(Vector2d oldPosition, Vector2d moveVector);

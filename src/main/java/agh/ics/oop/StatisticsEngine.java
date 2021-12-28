@@ -10,19 +10,20 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
 
-public class StatisticsEngine implements Runnable {
+import static java.lang.System.out;
+
+public class StatisticsEngine implements Runnable, IDayChangeObserver {
     private final AbstractWorldMap map;
     private int daysCounter;
     private final Label genotypeLabel;
     private String genotypeLabelString;
 
-
     private final Vector<Vector<Double>> chartDataList;
     private static final Vector<LineChart<Number, Number>> lineChart = new Vector<>();
     private final Vector<XYChart.Series<Number, Number>> lineChartDataSeries;
-    private final String mapName;
-
     private final List<Integer> lifeSpansList;
+
+    private final String mapName;
 
     public StatisticsEngine(AbstractWorldMap map, String mapName) {
         lifeSpansList = new Vector<>();
@@ -37,20 +38,19 @@ public class StatisticsEngine implements Runnable {
         }
         lineChartDataSeries = new Vector<>();
 
-
-        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> aliveAnimalsCounterLineChartPair = createLineChart("Number of animals", "Number of animals over time");
+        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> aliveAnimalsCounterLineChartPair = createLineChart("Number of animals over time");
         lineChartDataSeries.add(aliveAnimalsCounterLineChartPair.getValue());
 
-        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> grassCounterLineChartPair = createLineChart("Number of grass fields", "Number of grass fields over time");
+        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> grassCounterLineChartPair = createLineChart("Number of grass fields over time");
         lineChartDataSeries.add(grassCounterLineChartPair.getValue());
 
-        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgEnergyLineChartPair = createLineChart("Average energy", "Average animal energy over time");
+        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgEnergyLineChartPair = createLineChart("Average animal energy over time");
         lineChartDataSeries.add(avgEnergyLineChartPair.getValue());
 
-        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsLiveSPanLineChartPair = createLineChart("Average live span", "Average animal live span over time");
+        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsLiveSPanLineChartPair = createLineChart("Average animal live span over time");
         lineChartDataSeries.add(avgAnimalsLiveSPanLineChartPair.getValue());
 
-        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsChildrenNumberLineChartPair = createLineChart("Average children amount", "Average animal children amount over time");
+        Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> avgAnimalsChildrenNumberLineChartPair = createLineChart("Average animal children amount over time");
         lineChartDataSeries.add(avgAnimalsChildrenNumberLineChartPair.getValue());
 
         if (lineChart.isEmpty()) {
@@ -66,14 +66,12 @@ public class StatisticsEngine implements Runnable {
             lineChart.get(3).getData().add(avgAnimalsLiveSPanLineChartPair.getValue());
             lineChart.get(4).getData().add(avgAnimalsChildrenNumberLineChartPair.getValue());
         }
-
     }
 
-    private Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> createLineChart(String yAxisLabel, String chartTitle) {
+    private Pair<LineChart<Number, Number>, XYChart.Series<Number, Number>> createLineChart(String chartTitle) {
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Number of days");
-        yAxis.setLabel(yAxisLabel);
         LineChart<Number, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle(chartTitle);
         XYChart.Series<Number, Number> lineChartDataSeries = new XYChart.Series<>();
@@ -84,7 +82,7 @@ public class StatisticsEngine implements Runnable {
 
     public List<Vector2d> getDominantGenotypesPositions() {
         List<Vector2d> dominantGenotypesPositions = new Vector<>();
-        for (Animal animal : map.getAliveAnimals()) {
+        for (Animal animal : map.mapObjectsHandler.getAliveAnimals()) {
             if (Arrays.toString(animal.getGenotype()).equals(genotypeLabelString)) {
                 dominantGenotypesPositions.add(animal.getPosition());
             }
@@ -93,29 +91,21 @@ public class StatisticsEngine implements Runnable {
         return dominantGenotypesPositions;
     }
 
-    public void addALifespan(Integer lifespan){
+    public void addALifespan(Integer lifespan) {
         lifeSpansList.add(lifespan);
     }
 
     public void run() {
         for (int i = 0; i < 5; i++) {
-            updateLineChartDataSeries(lineChartDataSeries.get(i), lastElement(chartDataList.get(i)));
+            while (lineChartDataSeries.get(i).getData().size() < chartDataList.get(i).size()) {
+                int lineChartSize = lineChartDataSeries.get(i).getData().size();
+                lineChartDataSeries.get(i).getData().add(new XYChart.Data<>(lineChartSize, chartDataList.get(i).get(lineChartSize)));
+            }
         }
         genotypeLabel.setText(genotypeLabelString);
     }
 
-    public Double lastElement(List<Double> list) {
-        if (list.isEmpty()) {
-            return 0.0;
-        }
-        return list.get(list.size() - 1);
-    }
-
-    public void updateLineChartDataSeries(XYChart.Series<Number, Number> lineChartDataSeries, Double newValue) {
-        lineChartDataSeries.getData().add(new XYChart.Data<>(daysCounter, newValue));
-    }
-
-
+    @Override
     public void newDayHasCome() {
         daysCounter++;
     }
@@ -142,8 +132,8 @@ public class StatisticsEngine implements Runnable {
 
     public void getStatsToFile() {
         try {
-            PrintWriter writer = new PrintWriter(mapName +"Day"+ getDaysCounter() + ".csv");
-            StringBuilder stringBuilder = new StringBuilder("Animal amount, Grass amount, Average animal energy, Average animal lifespan, Average animal children amount");
+            PrintWriter writer = new PrintWriter(mapName + "Day" + getDaysCounter() + ".csv");
+            StringBuilder stringBuilder = new StringBuilder("Animal amount, Grass amount, Average animal energy, Average animal lifespan, Average animal children amount\n");
             for (int i = 0; i < chartDataList.get(0).size(); i++) {
                 for (int j = 0; j < 5; j++) {
                     stringBuilder.append(chartDataList.get(j).get(i).toString()).append(",");
@@ -163,7 +153,7 @@ public class StatisticsEngine implements Runnable {
 
     public Double getAvgEnergy() {
         int energySum = 0;
-        for (Animal animal : map.getAliveAnimals()) {
+        for (Animal animal : map.mapObjectsHandler.getAliveAnimals()) {
             energySum += animal.getEnergy();
         }
         if (map.getAliveAnimalsCounter() == 0) {
@@ -185,7 +175,7 @@ public class StatisticsEngine implements Runnable {
 
     public Double getAvgChildrenCount() {
         int childrenCount = 0;
-        for (Animal animal : map.getAliveAnimals()) {
+        for (Animal animal : map.mapObjectsHandler.getAliveAnimals()) {
             childrenCount += animal.getChildrenCounter();
         }
         if (map.getAliveAnimalsCounter() == 0) {
@@ -196,7 +186,7 @@ public class StatisticsEngine implements Runnable {
 
     public void updateMostPopularGenotype() {
         Map<String, Integer> genotypesCounterMap = new TreeMap<>();
-        for (Animal animal : map.getAliveAnimals()) {
+        for (Animal animal : map.mapObjectsHandler.getAliveAnimals()) {
             genotypesCounterMap.putIfAbsent(Arrays.toString(animal.getGenotype()), 0);
             Integer currValue = genotypesCounterMap.get(Arrays.toString(animal.getGenotype()));
             genotypesCounterMap.put(Arrays.toString(animal.getGenotype()), currValue + 1);

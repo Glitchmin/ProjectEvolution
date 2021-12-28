@@ -3,8 +3,6 @@ package agh.ics.oop;
 import java.util.*;
 
 public class MapObjectsHandler implements IPositionChangeObserver {
-
-
     private final SortedMap<Vector2d, List<IMapElement>> objectPositions = new TreeMap<>(Vector2d.xFirstComparator);
     private final List<Animal> aliveAnimals = new Vector<>();
     private final List<Vector2d> grassPositionsList = new Vector<>();
@@ -45,8 +43,7 @@ public class MapObjectsHandler implements IPositionChangeObserver {
         return (Vector2d) freePositionsOutsideTheJungle.toArray()[whichPosition];
     }
 
-
-    MapObjectsHandler() {
+    public MapObjectsHandler() {
         for (int i = 0; i < AbstractWorldMap.getWidth(); i++) {
             for (int j = 0; j < AbstractWorldMap.getHeight(); j++) {
                 addAFreePosition(new Vector2d(i, j));
@@ -75,7 +72,6 @@ public class MapObjectsHandler implements IPositionChangeObserver {
     public List<IMapElement> objectAt(Vector2d position) {
         return objectPositions.get(position);
     }
-
 
     public void addAnimal(Animal animal) {
         aliveAnimals.add(animal);
@@ -127,7 +123,6 @@ public class MapObjectsHandler implements IPositionChangeObserver {
             addAFreePosition(position);
         }
     }
-
 
     public List<IMapElement> getMapElementsList() {
         List<IMapElement> mapElementsList = new Vector<>();

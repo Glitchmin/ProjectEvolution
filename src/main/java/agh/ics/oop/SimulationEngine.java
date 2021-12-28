@@ -58,6 +58,7 @@ public class SimulationEngine implements IEngine, Runnable {
             map.place(new Animal(map, position, 0));
         }
         this.map = map;
+        addDayObserver(statisticsEngine);
     }
 
     public void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
@@ -67,7 +68,6 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     public void newDayHasCome() {
-        statisticsEngine.newDayHasCome();
         for (IDayChangeObserver observer : dayObservers) {
             observer.newDayHasCome();
         }
@@ -76,7 +76,7 @@ public class SimulationEngine implements IEngine, Runnable {
     private void doMagic() {
         if (getAliveAnimalsCounter() == 5 && magicCounter > 0) {
             magicCounter--;
-            List<Animal> animalList = new Vector<>(map.getAliveAnimals());
+            List<Animal> animalList = new Vector<>(map.mapObjectsHandler.getAliveAnimals());
             Random rn = new Random();
             for (Animal animal : animalList) {
                 Vector2d position = new Vector2d(rn.nextInt(AbstractWorldMap.getWidth()), rn.nextInt(AbstractWorldMap.getHeight()));
@@ -93,24 +93,23 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     private void removeDeadAnimals() {
-        List<Animal> animalListCopy = new Vector<>(map.getAliveAnimals());
+        List<Animal> animalListCopy = new Vector<>(map.mapObjectsHandler.getAliveAnimals());
         for (Animal animal : animalListCopy) {
             if (animal.isOutOfEnergy()) {
                 if (animal == animalTracker.getAnimal()) {
                     animalTracker.justDied(statisticsEngine.getDaysCounter());
                 }
                 statisticsEngine.addALifespan((statisticsEngine.getDaysCounter() - animal.getDayOfBirth()));
-                map.removeAnimal(animal);
-                map.getAliveAnimals().remove(animal);
+                map.mapObjectsHandler.removeAnimal(animal);
+                map.mapObjectsHandler.getAliveAnimals().remove(animal);
             }
         }
         doMagic();
         Platform.runLater(statisticsEngine);
     }
 
-
     private void moveAllAnimals() {
-        for (Animal animal : map.getAliveAnimals()) {
+        for (Animal animal : map.mapObjectsHandler.getAliveAnimals()) {
             animal.subtractMoveEnergy();
             Vector2d oldPosition = new Vector2d(animal.getPosition().x, animal.getPosition().y);
             animal.move();
@@ -119,7 +118,7 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     private void feedAllAnimals() {
-        SortedMap<Vector2d, List<IMapElement>> objectPositions = map.getObjectPositions();
+        SortedMap<Vector2d, List<IMapElement>> objectPositions = map.mapObjectsHandler.getObjectPositions();
         List<Vector2d> keySetCopy = new Vector<>(objectPositions.keySet());
         for (Vector2d position : keySetCopy) {
             calculateEatingForPos(objectPositions, position);
@@ -159,7 +158,7 @@ public class SimulationEngine implements IEngine, Runnable {
                 }
             }
             if (highestEnergy != null) {
-                map.removeGrass(position);
+                map.mapObjectsHandler.removeGrass(position);
                 positionChanged(position, position, null);
             }
         }
@@ -198,8 +197,8 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     private void reproduceAllAnimals() {
-        for (Vector2d position : map.getObjectPositions().keySet()) {
-            Pair<Animal, Animal> animalsInLoveUwU = get2StrongestAnimalsAtPos(map.getObjectPositions(), position);
+        for (Vector2d position : map.mapObjectsHandler.getObjectPositions().keySet()) {
+            Pair<Animal, Animal> animalsInLoveUwU = get2StrongestAnimalsAtPos(map.mapObjectsHandler.getObjectPositions(), position);
             if (animalsInLoveUwU.getValue() != null && animalsInLoveUwU.getValue().getEnergy() > Animal.getStartEnergy() / 2) {
                 Animal animal = new Animal(animalsInLoveUwU.getKey(), animalsInLoveUwU.getValue(), statisticsEngine.getDaysCounter());
                 map.place(animal);
@@ -222,7 +221,7 @@ public class SimulationEngine implements IEngine, Runnable {
         return getAliveAnimalsCounter() == 0;
     }
 
-    private void addStatistics() {
+    private void addStatisticsToCharts() {
         statisticsEngine.addData(LineCharts.aliveAnimalsCounter, map.getAliveAnimalsCounter());
         statisticsEngine.addData(LineCharts.grassCounter, map.getGrassCounter());
         statisticsEngine.addData(LineCharts.avgEnergy, statisticsEngine.getAvgEnergy());
@@ -238,7 +237,7 @@ public class SimulationEngine implements IEngine, Runnable {
                 feedAllAnimals();
                 reproduceAllAnimals();
                 addGrassToMap();
-                addStatistics();
+                addStatisticsToCharts();
                 newDayHasCome();
 
                 try {
@@ -257,5 +256,4 @@ public class SimulationEngine implements IEngine, Runnable {
             }
         }
     }
-
 }

@@ -4,13 +4,13 @@ import java.util.Comparator;
 import java.util.Objects;
 
 public class Vector2d {
+    final public int x;
+    final public int y;
+
     public Vector2d(int x, int y) {
         this.x = x;
         this.y = y;
     }
-
-    final public int x;
-    final public int y;
 
     public String toString() {
         return "(" + this.x + "," + y + ")";
@@ -23,7 +23,6 @@ public class Vector2d {
     public boolean follows(Vector2d other) {
         return (this.x >= other.x && this.y >= other.y);
     }
-
 
     public Vector2d add(Vector2d other) {
         return new Vector2d(this.x + other.x, this.y + other.y);

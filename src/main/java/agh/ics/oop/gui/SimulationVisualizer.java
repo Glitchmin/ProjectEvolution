@@ -43,7 +43,7 @@ public class SimulationVisualizer implements Runnable, IPositionChangeObserver {
     private void addToGuiElementsListMap(Vector2d position, GuiElementBox guiElementBox, boolean isGrass) {
         vBoxListMap.computeIfAbsent(position, k -> new Vector<>());
         simulationGridPane.add(guiElementBox.getVBox(), position.x, position.y, 1, 1);
-        guiElementBox.getVBox().setOnMouseClicked(Action -> checkGridPane(guiElementBox.getVBox()));
+        guiElementBox.getVBox().setOnMouseClicked(Action -> updateObservedAnimals(guiElementBox.getVBox()));
         if (!isGrass) {
             vBoxListMap.get(position).add(guiElementBox.getVBox());
         }
@@ -93,21 +93,23 @@ public class SimulationVisualizer implements Runnable, IPositionChangeObserver {
         }
     }
 
-
-    private void checkGridPane(VBox vBox) {
+    private void updateObservedAnimals(VBox vBox) {
         for (Vector2d position : vBoxListMap.keySet()) {
             for (VBox vBoxFromList : vBoxListMap.get(position)) {
                 if (vBox == vBoxFromList) {
                     if (map.objectsAt(position) != null) {
-                        map.mapObjectsHandler.removeTrackingFromAnimals();
-                        animalTracker.addAnimal((Animal) map.objectsAt(position).get(0));
-                        updateObservedAnimalVBox();
+                        for (IMapElement mapElement : map.objectsAt(position)) {
+                            if (mapElement instanceof Animal) {
+                                map.mapObjectsHandler.removeTrackingFromAnimals();
+                                animalTracker.addAnimal((Animal) mapElement);
+                                updateObservedAnimalVBox();
+                            }
+                        }
                     }
                 }
             }
         }
     }
-
 
     public GridPane getSimulationGridPane() {
         return simulationGridPane;
@@ -119,7 +121,6 @@ public class SimulationVisualizer implements Runnable, IPositionChangeObserver {
         observedAnimalOffspringLabel.setText(animalTracker.getOffspringCounter());
         observedAnimalChildrenLabel.setText(animalTracker.getChildrenCounter());
         observedAnimalGenomeLabel.setText(animalTracker.getGenotype());
-
     }
 
     public void run() {
@@ -153,7 +154,6 @@ public class SimulationVisualizer implements Runnable, IPositionChangeObserver {
         }
     }
 
-
     public void markDominantGenotypes(List<Vector2d> positionsList) {
         for (Vector2d position : positionsList) {
             try {
@@ -178,5 +178,4 @@ public class SimulationVisualizer implements Runnable, IPositionChangeObserver {
         positionsToUpdate.add(oldPosition);
         positionsToUpdate.add(newPosition);
     }
-
 }

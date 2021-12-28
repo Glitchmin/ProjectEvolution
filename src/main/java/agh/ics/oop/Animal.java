@@ -12,7 +12,7 @@ public class Animal implements IMapElement {
     private final List<IPositionChangeObserver> observers = new ArrayList<>();
     private int energy;
     private final int dayOfBirth;
-    private int childrenCounter;
+    private int childrenCounter=0;
     private final int[] genotype;
     private boolean isOffspringOfTrackedAnimal;
     private boolean isTracked;
@@ -59,7 +59,6 @@ public class Animal implements IMapElement {
 
     public Animal(Animal parent1, Animal parent2, int dayOfBirth) {
         this.dayOfBirth = dayOfBirth;
-        this.childrenCounter = 0;
         parent1.childrenCounter++;
         parent2.childrenCounter++;
         this.isOffspringOfTrackedAnimal = parent1.isOffspringOfTrackedAnimal || parent2.isOffspringOfTrackedAnimal || parent1.isTracked || parent2.isTracked;
@@ -88,12 +87,10 @@ public class Animal implements IMapElement {
         this.dayOfBirth = dayOfBirth;
         this.position = position;
         this.direction = MapDirection.values()[rn.nextInt(8)];
-        this.childrenCounter = 0;
         this.genotype = animalToCopy.genotype;
         this.energy = startEnergy;
         this.map = animalToCopy.map;
     }
-
 
     public Animal(AbstractWorldMap map, Vector2d initialPos, int dayOfBirth) {
         Random rn = new Random();
@@ -101,7 +98,6 @@ public class Animal implements IMapElement {
         this.position = initialPos;
         this.direction = MapDirection.values()[rn.nextInt(8)];
         this.map = map;
-        this.childrenCounter = 0;
         this.energy = startEnergy;
         this.genotype = new int[32];
         for (int i = 0; i < 32; i++) {
@@ -131,7 +127,6 @@ public class Animal implements IMapElement {
         return genotype;
     }
 
-
     public void move() {
         Vector2d moveVector = new Vector2d(0, 0);
         int direction = genotype[new Random().nextInt(32)];
@@ -153,7 +148,7 @@ public class Animal implements IMapElement {
         this.observers.remove(observer);
     }
 
-    void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
+    private void positionChanged(Vector2d oldPosition, Vector2d newPosition, IMapElement object) {
         for (IPositionChangeObserver observer : observers) {
             observer.positionChanged(oldPosition, newPosition, object);
         }
