@@ -16,7 +16,7 @@ public class GuiElementBox {
     private final VBox vBox;
     static private int width;
     static private int height;
-    static Map<String, Image> imagesMap = new HashMap<>();
+    static private final Map<String, Image> imagesMap = new HashMap<>();
 
     public static void setWidth(int width) {
         GuiElementBox.width = width;

@@ -9,17 +9,17 @@ public class Animal implements IMapElement {
     private Vector2d position;
     private MapDirection direction;
     private final AbstractWorldMap map;
-    final List<IPositionChangeObserver> observers = new ArrayList<>();
+    private final List<IPositionChangeObserver> observers = new ArrayList<>();
     private int energy;
     private final int dayOfBirth;
     private int childrenCounter;
-    final private int[] genotype;
+    private final int[] genotype;
     private boolean isOffspringOfTrackedAnimal;
     private boolean isTracked;
 
-    static private int startEnergy;
-    static private int moveEnergy;
-    static private int plantEnergy;
+    private static int startEnergy;
+    private static int moveEnergy;
+    private static int plantEnergy;
 
     public static int getStartEnergy() {
         return startEnergy;

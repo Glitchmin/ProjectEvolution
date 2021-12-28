@@ -50,7 +50,6 @@ abstract public class AbstractWorldMap {
         AbstractWorldMap.height = height;
     }
 
-
     public List<IMapElement> objectsAt(Vector2d position) {
         return mapObjectsHandler.objectAt(position);
     }

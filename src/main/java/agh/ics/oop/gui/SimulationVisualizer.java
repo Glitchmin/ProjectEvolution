@@ -79,8 +79,8 @@ public class SimulationVisualizer implements Runnable, IPositionChangeObserver {
                 out.println(Arrays.toString(ex.getStackTrace()));
             }
         }
-        for (int i = AbstractWorldMap.getJungleLowerLeft().x; i < AbstractWorldMap.getJungleLowerLeft().add(AbstractWorldMap.getJungleSize()).x; i++) {
-            for (int j = AbstractWorldMap.getJungleLowerLeft().y; j < AbstractWorldMap.getJungleLowerLeft().add(AbstractWorldMap.getJungleSize()).y; j++) {
+        for (int i = AbstractWorldMap.getJungleLowerLeft().x; i <= AbstractWorldMap.getJungleLowerLeft().add(AbstractWorldMap.getJungleSize()).x; i++) {
+            for (int j = AbstractWorldMap.getJungleLowerLeft().y; j <= AbstractWorldMap.getJungleLowerLeft().add(AbstractWorldMap.getJungleSize()).y; j++) {
                 Vector2d position = new Vector2d(i, j);
                 if (AbstractWorldMap.isInsideTheJungle(position)) {
                     try {

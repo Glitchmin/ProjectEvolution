@@ -20,10 +20,12 @@ public class StatisticsEngine implements Runnable {
     private final Vector<Vector<Double>> chartDataList;
     private static final Vector<LineChart<Number, Number>> lineChart = new Vector<>();
     private final Vector<XYChart.Series<Number, Number>> lineChartDataSeries;
+    private final String mapName;
 
 
-    public StatisticsEngine(AbstractWorldMap map) {
+    public StatisticsEngine(AbstractWorldMap map, String mapName) {
         this.map = map;
+        this.mapName = mapName;
         genotypeLabel = new Label("");
         genotypeLabelString = "";
         daysCounter = 0;
@@ -135,7 +137,7 @@ public class StatisticsEngine implements Runnable {
 
     public void getStatsToFile() {
         try {
-            PrintWriter writer = new PrintWriter("Data.csv");
+            PrintWriter writer = new PrintWriter(mapName + getDaysCounter() + ".csv");
             StringBuilder stringBuilder = new StringBuilder();
             for (int i = 0; i < chartDataList.get(0).size(); i++) {
                 for (int j = 0; j < 5; j++) {

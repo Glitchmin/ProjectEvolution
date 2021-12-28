@@ -5,11 +5,11 @@ import java.util.*;
 public class MapObjectsHandler implements IPositionChangeObserver {
 
 
-    SortedMap<Vector2d, List<IMapElement>> objectPositions = new TreeMap<>(Vector2d.xFirstComparator);
-    List<Animal> aliveAnimals = new Vector<>();
-    List<Vector2d> grassPositionsList = new Vector<>();
-    Set<Vector2d> freePositionsInTheJungle = new TreeSet<>(Vector2d.xFirstComparator);
-    Set<Vector2d> freePositionsOutsideTheJungle = new TreeSet<>(Vector2d.xFirstComparator);
+    private final SortedMap<Vector2d, List<IMapElement>> objectPositions = new TreeMap<>(Vector2d.xFirstComparator);
+    private final List<Animal> aliveAnimals = new Vector<>();
+    private final List<Vector2d> grassPositionsList = new Vector<>();
+    private final Set<Vector2d> freePositionsInTheJungle = new TreeSet<>(Vector2d.xFirstComparator);
+    private final Set<Vector2d> freePositionsOutsideTheJungle = new TreeSet<>(Vector2d.xFirstComparator);
 
     private void addAFreePosition(Vector2d position) {
         if (AbstractWorldMap.isInsideTheJungle(position)) {

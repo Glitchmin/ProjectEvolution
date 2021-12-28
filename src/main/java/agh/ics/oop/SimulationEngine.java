@@ -8,13 +8,16 @@ import java.util.*;
 import static java.lang.System.out;
 
 public class SimulationEngine implements IEngine, Runnable {
-    AbstractWorldMap map;
-    Integer moveDelayMs = 50;
+    private final AbstractWorldMap map;
+    private static int moveDelayMs;
     private boolean isPaused = false;
     public StatisticsEngine statisticsEngine;
     private final AnimalTracker animalTracker;
     private int magicCounter;
 
+    public static void setMoveDelayMs(int moveDelayMs) {
+        SimulationEngine.moveDelayMs = moveDelayMs;
+    }
 
     @Override
     public void addDayObserver(IDayChangeObserver observer) {
@@ -36,7 +39,7 @@ public class SimulationEngine implements IEngine, Runnable {
         positionObservers.remove(observer);
     }
 
-    public SimulationEngine(AbstractWorldMap map, int animalsAmount, AnimalTracker animalTracker, boolean isMagic) {
+    public SimulationEngine(AbstractWorldMap map, int animalsAmount, AnimalTracker animalTracker, boolean isMagic, String mapName) {
         if (isMagic) {
             magicCounter = 3;
         } else {
@@ -44,7 +47,7 @@ public class SimulationEngine implements IEngine, Runnable {
         }
         this.animalTracker = animalTracker;
         Random rn = new Random();
-        statisticsEngine = new StatisticsEngine(map);
+        statisticsEngine = new StatisticsEngine(map, mapName);
         for (int i = 0; i < animalsAmount; i++) {
             Vector2d position = new Vector2d(rn.nextInt(AbstractWorldMap.getWidth()), rn.nextInt(AbstractWorldMap.getHeight()));
             while (map.objectsAt(position) != null) {
@@ -251,7 +254,6 @@ public class SimulationEngine implements IEngine, Runnable {
                 }
             }
         }
-        out.println("they all died");
     }
 
 }
