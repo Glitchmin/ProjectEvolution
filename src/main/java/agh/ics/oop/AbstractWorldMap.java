@@ -15,7 +15,7 @@ abstract public class AbstractWorldMap {
 
     public static void calculateJungleSize() {
         jungleSize = new Vector2d((int) (width * jungleRatio), (int) (height * jungleRatio));
-        jungleLowerLeft = new Vector2d(width / 2 - jungleSize.x / 2, height / 2 - jungleSize.y / 2);
+        jungleLowerLeft = new Vector2d(width / 2 - jungleSize.x / 2 - 1, height / 2 - jungleSize.y / 2 - 1);
     }
 
     public static boolean isInsideTheJungle(Vector2d position) {
